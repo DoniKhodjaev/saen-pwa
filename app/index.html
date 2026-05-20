@@ -1,0 +1,4051 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#14223F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Saen">
+<title>Saen</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   SAEN PWA · v2 — Old Money Edition
+   Patina navy · Aged cream · Antique brass
+═══════════════════════════════════════════════ */
+
+:root {
+  --navy: #14223F;
+  --navy-deep: #0D1730;
+  --navy-soft: #20314F;
+  --cream: #F4EFE4;
+  --cream-deep: #EAE3D2;
+  --cream-warm: #E2D9C3;
+  --cream-shadow: #D8CDB2;
+  --silver: #A8A290;
+  --olive: #6F7359;
+  --brass: #9A7B4F;
+  --brass-light: #B89A6B;
+  --brass-pale: #C7B48C;
+  --ink: #14223F;
+  --oxblood: #5A2A2A;
+
+  --serif: 'Cormorant Garamond', 'Hoefler Text', Georgia, serif;
+  --sans: 'Inter', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  --nav-height: 82px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ─── Paper grain overlay ─── */
+.paper-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 199;
+  box-shadow: inset 0 0 120px rgba(20, 34, 63, 0.06);
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  background: var(--cream);
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  bottom: var(--nav-height);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease);
+  padding-bottom: 48px;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.screen::-webkit-scrollbar { width: 0; }
+
+.safe-top {
+  height: env(safe-area-inset-top, 0px);
+  background: var(--cream);
+  flex-shrink: 0;
+}
+
+/* ═══════════ ORNAMENTAL ELEMENTS ═══════════ */
+.divider-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 4px 26px;
+  margin: 8px 0;
+}
+
+.divider-ornament::before,
+.divider-ornament::after {
+  content: '';
+  height: 0.5px;
+  flex: 1;
+  background: var(--cream-shadow);
+}
+
+.divider-fleuron {
+  width: 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  border: 0.5px solid var(--brass);
+  flex-shrink: 0;
+}
+
+.divider-fleuron-center {
+  width: 3px;
+  height: 3px;
+  background: var(--brass);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.filet {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+}
+.filet-tl { top: 7px; left: 7px; border-top: 0.75px solid var(--brass); border-left: 0.75px solid var(--brass); }
+.filet-tr { top: 7px; right: 7px; border-top: 0.75px solid var(--brass); border-right: 0.75px solid var(--brass); }
+.filet-bl { bottom: 7px; left: 7px; border-bottom: 0.75px solid var(--brass); border-left: 0.75px solid var(--brass); }
+.filet-br { bottom: 7px; right: 7px; border-bottom: 0.75px solid var(--brass); border-right: 0.75px solid var(--brass); }
+
+/* ═══════════ TOP BAR ═══════════ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px 16px;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, var(--cream) 72%, rgba(244,239,228,0));
+  z-index: 10;
+}
+
+.topbar-symbol {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.symbol-mark { width: 28px; height: 28px; }
+.symbol-mark svg { display: block; width: 100%; height: 100%; }
+
+.topbar-wordmark {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+
+.topbar-meta {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--olive);
+}
+
+/* ═══════════ HOME SCREEN ═══════════ */
+.home-hero {
+  padding: 24px 26px 38px;
+  position: relative;
+}
+
+.hero-eyebrow {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  margin-bottom: 26px;
+  opacity: 0;
+  animation: rise 0.8s var(--ease) 0.1s forwards;
+}
+
+.hero-eyebrow::after {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 0.5px;
+  background: var(--brass);
+  margin-top: 10px;
+}
+
+.hero-edit-num {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  color: var(--olive);
+  margin-bottom: 6px;
+  opacity: 0;
+  animation: rise 0.8s var(--ease) 0.18s forwards;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: 88px;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 0.92;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 14px;
+  text-shadow: 0 1px 0 rgba(244,239,228,0.8), 0 2px 3px rgba(20,34,63,0.08);
+  opacity: 0;
+  animation: rise 0.9s var(--ease) 0.26s forwards;
+}
+
+.hero-arabic {
+  font-size: 30px;
+  color: var(--brass);
+  margin-bottom: 20px;
+  direction: rtl;
+  opacity: 0;
+  animation: rise 0.9s var(--ease) 0.32s forwards;
+}
+
+.hero-theme {
+  font-family: var(--serif);
+  font-size: 29px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 30px;
+  opacity: 0;
+  animation: rise 0.9s var(--ease) 0.4s forwards;
+}
+
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 20px;
+  border: 0.5px solid var(--brass);
+  position: relative;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  opacity: 0;
+  animation: rise 0.9s var(--ease) 0.48s forwards;
+}
+
+.hero-status::before,
+.hero-status::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+}
+.hero-status::before {
+  top: -1px; left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+.hero-status::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  background: var(--brass);
+  animation: pulse 2.6s ease-in-out infinite;
+}
+
+.countdown {
+  display: flex;
+  gap: 0;
+  margin-top: 34px;
+  border-top: 0.5px solid var(--cream-shadow);
+  border-bottom: 0.5px solid var(--cream-shadow);
+  position: relative;
+  opacity: 0;
+  animation: rise 0.9s var(--ease) 0.56s forwards;
+}
+
+.countdown::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: 0; right: 0;
+  height: 0.5px;
+  background: var(--cream-shadow);
+}
+
+.countdown-unit {
+  flex: 1;
+  padding: 20px 0 18px;
+  text-align: center;
+  border-right: 0.5px solid var(--cream-shadow);
+}
+
+.countdown-unit:last-child { border-right: none; }
+
+.countdown-num {
+  font-family: var(--serif);
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: oldstyle-nums;
+}
+
+.countdown-label {
+  font-family: var(--serif);
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  color: var(--olive);
+  margin-top: 8px;
+}
+
+.section {
+  padding: 38px 26px;
+}
+
+.section-label {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--olive);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--cream-shadow);
+}
+
+.curator-note {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.curator-note-excerpt {
+  font-style: italic;
+}
+
+.curator-sign {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 20px;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  color: var(--brass);
+  margin-top: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 2px;
+  border-bottom: 0.5px solid var(--brass);
+}
+
+.text-link-arrow {
+  transition: transform 0.3s var(--ease);
+  font-style: normal;
+}
+
+.text-link:active .text-link-arrow {
+  transform: translateX(4px);
+}
+
+.home-products {
+  padding: 0 26px 20px;
+}
+
+.product-preview-item {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 0.5px solid var(--cream-shadow);
+  cursor: pointer;
+  transition: padding-left 0.35s var(--ease);
+}
+
+.product-preview-item:active { padding-left: 10px; }
+.product-preview-item:last-child { border-bottom: none; }
+
+.pp-num {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--brass);
+  flex-shrink: 0;
+}
+
+.pp-body { flex: 1; }
+
+.pp-brand {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  color: var(--olive);
+  margin-bottom: 2px;
+}
+
+.pp-name {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+.pp-price {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink);
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
+
+/* ═══════════ CATALOG SCREEN ═══════════ */
+.catalog-head {
+  padding: 18px 26px 30px;
+  position: relative;
+}
+
+.catalog-title {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.02;
+}
+
+.catalog-sub {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--olive);
+  margin-top: 12px;
+}
+
+.catalog-list { padding: 0 26px; }
+
+.catalog-card {
+  padding: 26px 0;
+  border-bottom: 0.5px solid var(--cream-shadow);
+  cursor: pointer;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  transition: padding-left 0.4s var(--ease);
+}
+
+.catalog-card:active { padding-left: 10px; }
+.catalog-card:first-child { padding-top: 10px; }
+
+.cc-num {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--brass);
+  padding-top: 2px;
+  flex-shrink: 0;
+  min-width: 28px;
+}
+
+.cc-body { flex: 1; }
+
+.cc-cat {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--olive);
+  margin-bottom: 7px;
+}
+
+.cc-brand {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  margin-bottom: 1px;
+}
+
+.cc-name {
+  font-family: var(--serif);
+  font-size: 27px;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.12;
+  margin-bottom: 10px;
+}
+
+.cc-meta {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.cc-size {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--olive);
+}
+
+.cc-price {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--brass);
+  letter-spacing: -0.02em;
+}
+
+/* ═══════════ CATALOG SELECTION (checkbox) ═══════════ */
+.cc-toggle {
+  width: 32px;
+  height: 32px;
+  border: 0.5px solid var(--cream-shadow);
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 6px;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--brass);
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  position: relative;
+  padding: 0;
+  line-height: 1;
+}
+
+.cc-toggle::before,
+.cc-toggle::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+}
+.cc-toggle::before {
+  top: -1px; left: -1px;
+  border-top: 0.75px solid var(--brass);
+  border-left: 0.75px solid var(--brass);
+}
+.cc-toggle::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 0.75px solid var(--brass);
+  border-right: 0.75px solid var(--brass);
+}
+
+.cc-toggle:active { transform: scale(0.92); }
+
+.catalog-card.selected .cc-toggle {
+  background: var(--brass);
+  color: var(--cream);
+  border-color: var(--brass);
+}
+
+.catalog-card.selected {
+  background: linear-gradient(90deg, rgba(154,123,79,0.04), transparent);
+}
+
+/* ═══════════ FLOATING CART PILL ═══════════ */
+.cart-pill {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: calc(var(--nav-height) + 14px);
+  background: var(--navy);
+  color: var(--cream);
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 40;
+  border: 0.5px solid var(--brass);
+  transform: translateY(calc(100% + var(--nav-height) + 30px));
+  transition: transform 0.45s var(--ease);
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(20,34,63,0.25);
+}
+
+.cart-pill.show { transform: translateY(0); }
+
+.cart-pill::before, .cart-pill::after {
+  content: ''; position: absolute; width: 6px; height: 6px;
+}
+.cart-pill::before {
+  top: -1px; left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+.cart-pill::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+.cart-pill-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cart-pill-count {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--brass-pale);
+  letter-spacing: 0.03em;
+}
+
+.cart-pill-total {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1;
+}
+
+.cart-pill-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--cream);
+  font-weight: 500;
+}
+
+.cart-pill-cta-arrow {
+  font-style: normal;
+  font-size: 18px;
+  transition: transform 0.3s var(--ease);
+}
+
+.cart-pill:active .cart-pill-cta-arrow {
+  transform: translateX(4px);
+}
+
+/* ═══════════ CHECKOUT MODAL ═══════════ */
+.checkout-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--cream);
+  border-radius: 8px 8px 0 0;
+  height: 96%;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform 0.5s var(--ease);
+  border-top: 0.5px solid var(--brass);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-backdrop.open .checkout-sheet {
+  transform: translateY(0);
+}
+
+.checkout-head {
+  padding: 16px 22px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid var(--cream-shadow);
+  flex-shrink: 0;
+}
+
+.checkout-step-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--brass);
+}
+
+.checkout-close {
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  font-family: var(--serif);
+}
+
+.checkout-progress {
+  display: flex;
+  gap: 6px;
+  padding: 14px 22px;
+  flex-shrink: 0;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 2px;
+  background: var(--cream-shadow);
+  transition: background 0.4s var(--ease);
+}
+
+.progress-bar.done { background: var(--brass); }
+.progress-bar.current {
+  background: linear-gradient(90deg, var(--brass) 50%, var(--cream-shadow) 50%);
+}
+
+.checkout-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 22px 24px;
+}
+
+.checkout-body::-webkit-scrollbar { width: 0; }
+
+.checkout-step-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 12px;
+  margin-bottom: 6px;
+  line-height: 1.05;
+}
+
+.checkout-step-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--olive);
+  margin-bottom: 24px;
+}
+
+/* Review items */
+.review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 0.5px solid var(--cream-shadow);
+}
+
+.review-item:last-child { border-bottom: none; }
+
+.review-item-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--brass);
+  flex-shrink: 0;
+  padding-top: 2px;
+  width: 26px;
+}
+
+.review-item-body { flex: 1; min-width: 0; }
+
+.review-item-brand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--olive);
+  margin-bottom: 2px;
+}
+
+.review-item-name {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 5px;
+}
+
+.review-item-meta {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--olive);
+}
+
+.review-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.review-item-price {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--brass);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.review-remove {
+  background: none;
+  border: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--olive);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.review-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 22px;
+  margin-top: 6px;
+  border-top: 0.5px solid var(--cream-shadow);
+}
+
+.review-total-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--olive);
+}
+
+.review-total-value {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.review-prepayment {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--cream-deep);
+  border: 0.5px solid var(--cream-shadow);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--olive);
+  line-height: 1.5;
+}
+
+.review-prepayment b {
+  font-weight: 600;
+  font-style: normal;
+  color: var(--ink);
+}
+
+/* Form fields */
+.form-group { margin-bottom: 22px; }
+
+.form-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--olive);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.form-label .req {
+  color: var(--brass);
+  font-style: normal;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--cream);
+  border: 0.5px solid var(--cream-shadow);
+  padding: 14px 16px;
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.3s var(--ease);
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+.form-input:focus { border-color: var(--brass); }
+
+.form-input::placeholder {
+  color: var(--silver);
+  font-style: italic;
+}
+
+.form-hint {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--olive);
+  margin-top: 6px;
+}
+
+/* Radio choice cards */
+.choice-group { display: flex; flex-direction: column; gap: 12px; }
+
+.choice-card {
+  border: 0.5px solid var(--cream-shadow);
+  padding: 18px 18px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s var(--ease);
+  background: var(--cream);
+}
+
+.choice-card.selected {
+  border-color: var(--brass);
+  background: linear-gradient(90deg, rgba(154,123,79,0.04), transparent);
+}
+
+.choice-card.selected::before,
+.choice-card.selected::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+}
+.choice-card.selected::before {
+  top: -1px; left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+.choice-card.selected::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+.choice-title {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.choice-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--olive);
+}
+
+/* Checkout bottom action bar */
+.checkout-action {
+  padding: 16px 22px env(safe-area-inset-bottom, 16px);
+  border-top: 0.5px solid var(--cream-shadow);
+  background: var(--cream);
+  flex-shrink: 0;
+  display: flex;
+  gap: 12px;
+}
+
+.btn-back {
+  background: none;
+  border: 0.5px solid var(--cream-shadow);
+  padding: 16px 22px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--olive);
+  cursor: pointer;
+}
+
+.btn-primary {
+  flex: 1;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 16px 22px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-primary:disabled {
+  background: var(--silver);
+  cursor: not-allowed;
+}
+
+.btn-primary::before,
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+}
+.btn-primary::before {
+  top: -1px; left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+.btn-primary::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+/* Confirmation step */
+.confirm-icon {
+  width: 64px;
+  height: 64px;
+  border: 0.5px solid var(--brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 32px auto 24px;
+  position: relative;
+}
+
+.confirm-icon::before,
+.confirm-icon::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+}
+.confirm-icon::before {
+  top: -1px; left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+.confirm-icon::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+.confirm-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--brass);
+  fill: none;
+  stroke-width: 1.4;
+}
+
+.confirm-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.05;
+  margin-bottom: 12px;
+}
+
+.confirm-text {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.55;
+  margin-bottom: 30px;
+}
+
+.confirm-order-id {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.confirm-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.confirm-divider::before, .confirm-divider::after {
+  content: '';
+  height: 0.5px;
+  flex: 1;
+  background: var(--cream-shadow);
+}
+.confirm-divider span {
+  width: 4px;
+  height: 4px;
+  background: var(--brass);
+  transform: rotate(45deg);
+}
+
+/* ═══════════ COLLECTION SCREEN ═══════════ */
+.collection-head {
+  padding: 18px 26px 26px;
+}
+
+.collection-title {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.collection-sub {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--olive);
+  margin-top: 12px;
+}
+
+.collection-progress {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--ink);
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--cream-shadow);
+  line-height: 1.45;
+}
+
+.collection-progress b {
+  font-weight: 700;
+  font-style: normal;
+}
+
+.edition-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 10px 26px 0;
+}
+
+.edition-tile {
+  aspect-ratio: 3 / 4;
+  border: 0.5px solid var(--cream-shadow);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  background: var(--cream);
+  cursor: pointer;
+  transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+
+.edition-tile.unlocked {
+  border-color: var(--tile-accent, var(--brass));
+  box-shadow: 0 1px 0 rgba(244,239,228,0.6), 0 4px 14px rgba(20,34,63,0.06);
+}
+
+.edition-tile.locked::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--tile-accent, var(--brass));
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.edition-tile.unlocked:active {
+  transform: scale(0.975);
+}
+
+.edition-tile.locked {
+  background: var(--cream-deep);
+  cursor: default;
+}
+
+.edition-tile.locked .et-name,
+.edition-tile.locked .et-num,
+.edition-tile.locked .et-arabic {
+  opacity: 0.34;
+}
+
+.et-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.et-num {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--tile-accent, var(--brass));
+}
+
+.et-medallion {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--tile-accent, var(--brass));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.et-medallion::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 0.5px solid var(--tile-soft, var(--brass-pale));
+}
+
+.et-medallion svg { width: 17px; height: 17px; }
+
+.edition-tile.locked .et-medallion {
+  border-color: var(--silver);
+  opacity: 0.4;
+}
+.edition-tile.locked .et-medallion::after {
+  border-color: var(--silver);
+}
+
+.et-lock {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.et-lock svg { width: 14px; height: 14px; }
+
+.et-arabic {
+  font-size: 18px;
+  color: var(--tile-accent, var(--brass));
+  direction: rtl;
+  margin-bottom: 5px;
+}
+
+.et-name {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.et-theme {
+  font-family: var(--serif);
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--olive);
+  margin-top: 7px;
+}
+
+.et-status-tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--tile-accent, var(--brass));
+  color: var(--cream);
+  font-family: var(--serif);
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  padding: 4px 11px;
+  z-index: 2;
+}
+
+/* ═══════════ INSTALL CARD (on Home) ═══════════ */
+.install-card {
+  margin: 8px 26px 0;
+  border: 0.5px solid var(--brass);
+  background: var(--navy);
+  padding: 26px 24px;
+  position: relative;
+  display: none;
+}
+
+.install-card.show { display: block; }
+
+.install-card-label {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  color: var(--brass-pale);
+  margin-bottom: 12px;
+}
+
+.install-card-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1.12;
+  margin-bottom: 10px;
+}
+
+.install-card-text {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--cream-warm);
+  line-height: 1.45;
+  margin-bottom: 22px;
+  opacity: 0.82;
+}
+
+.install-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--cream);
+  color: var(--navy);
+  border: none;
+  padding: 15px 26px;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  transition: gap 0.3s var(--ease);
+}
+
+.install-card-btn:active { gap: 18px; }
+
+.install-card-btn::before,
+.install-card-btn::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+}
+.install-card-btn::before {
+  top: -1px; left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+.install-card-btn::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+.install-card-dismiss {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--silver);
+  font-family: var(--serif);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+}
+
+/* ═══════════ iOS INSTALL INSTRUCTION MODAL ═══════════ */
+.ios-guide-body {
+  padding: 40px 30px 50px;
+}
+
+.ios-guide-title {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.05;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.ios-guide-sub {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--olive);
+  margin-bottom: 34px;
+  text-align: center;
+}
+
+.ios-step {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-align: left;
+  padding: 20px 0;
+  border-bottom: 0.5px solid var(--cream-shadow);
+}
+
+.ios-step:last-child { border-bottom: none; }
+
+.ios-step-num {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--brass);
+  flex-shrink: 0;
+  width: 30px;
+}
+
+.ios-step-icon {
+  width: 42px;
+  height: 42px;
+  border: 0.5px solid var(--brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ios-step-icon svg { width: 22px; height: 22px; }
+
+.ios-step-text {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.ios-step-text b { font-weight: 600; }
+
+.ios-guide-note {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--olive);
+  margin-top: 28px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ═══════════ ORDERS / LEDGER SCREEN ═══════════ */
+.orders-head {
+  padding: 18px 26px 26px;
+}
+
+.orders-title {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.orders-sub {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--olive);
+  margin-top: 12px;
+}
+
+.order-card {
+  margin: 10px 26px 20px;
+  border: 0.5px solid var(--brass);
+  position: relative;
+  background: var(--cream);
+  box-shadow: 0 1px 0 rgba(244,239,228,0.6), 0 4px 16px rgba(20,34,63,0.05);
+}
+
+.order-card-head {
+  padding: 20px 22px;
+  background: var(--cream-deep);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 0.5px solid var(--cream-shadow);
+}
+
+.oc-edit {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.oc-id {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--olive);
+  letter-spacing: -0.02em;
+}
+
+.order-card-body { padding: 24px 22px; }
+
+.oc-items {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.oc-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 22px;
+  border-bottom: 0.5px solid var(--cream-shadow);
+  margin-bottom: 24px;
+}
+
+.oc-total-label {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--olive);
+}
+
+.oc-total-value {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tracker { display: flex; flex-direction: column; gap: 0; }
+.tracker-step { display: flex; gap: 16px; position: relative; }
+
+.tracker-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tracker-dot {
+  width: 11px;
+  height: 11px;
+  transform: rotate(45deg);
+  border: 1px solid var(--silver);
+  background: var(--cream);
+  z-index: 2;
+  margin-top: 3px;
+}
+
+.tracker-step.done .tracker-dot {
+  background: var(--brass);
+  border-color: var(--brass);
+}
+
+.tracker-step.current .tracker-dot {
+  border-color: var(--brass);
+  background: var(--cream);
+  box-shadow: 0 0 0 4px rgba(154,123,79,0.16);
+}
+
+.tracker-line {
+  width: 0.5px;
+  flex: 1;
+  background: var(--silver);
+  min-height: 30px;
+}
+
+.tracker-step.done .tracker-line {
+  background: var(--brass);
+}
+
+.tracker-step:last-child .tracker-line { display: none; }
+
+.tracker-body {
+  padding-bottom: 24px;
+  flex: 1;
+}
+
+.tracker-step:last-child .tracker-body { padding-bottom: 0; }
+
+.tracker-label {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.tracker-step:not(.done):not(.current) .tracker-label {
+  color: var(--silver);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.tracker-date {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--olive);
+}
+
+.orders-footnote {
+  padding: 4px 26px 0;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--olive);
+  text-align: center;
+}
+
+/* ═══════════ LETTERS SCREEN ═══════════ */
+.letters-head {
+  padding: 18px 26px 26px;
+}
+
+.letters-title {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.letters-sub {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--olive);
+  margin-top: 12px;
+}
+
+.letter-item {
+  margin: 0 26px;
+  padding: 26px 0;
+  border-bottom: 0.5px solid var(--cream-shadow);
+  cursor: pointer;
+  transition: padding-left 0.4s var(--ease);
+}
+
+.letter-item.locked {
+  cursor: default;
+  opacity: 0.42;
+}
+
+.letter-item.unlocked:active {
+  padding-left: 10px;
+}
+
+.letter-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 9px;
+}
+
+.li-edit {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+}
+
+.li-status {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--olive);
+}
+
+.li-name {
+  font-family: var(--serif);
+  font-size: 34px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 7px;
+}
+
+.li-excerpt {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--olive);
+  line-height: 1.4;
+}
+
+/* ═══════════ BOTTOM NAV ═══════════ */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  background: var(--navy);
+  display: flex;
+  align-items: flex-start;
+  padding: 14px 8px env(safe-area-inset-bottom, 8px);
+  z-index: 50;
+  border-top: 0.5px solid var(--brass);
+}
+
+.bottom-nav::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: 26px; right: 26px;
+  height: 0.5px;
+  background: rgba(154,123,79,0.4);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  position: relative;
+}
+
+.nav-icon {
+  width: 19px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: var(--silver);
+  fill: none;
+  stroke-width: 1.25;
+  transition: stroke 0.35s var(--ease);
+}
+
+.nav-item.active .nav-icon svg {
+  stroke: var(--cream);
+}
+
+.nav-label {
+  font-family: var(--serif);
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--silver);
+  transition: color 0.35s var(--ease);
+}
+
+.nav-item.active .nav-label {
+  color: var(--cream);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  width: 5px;
+  height: 5px;
+  background: var(--brass);
+  transform: rotate(45deg);
+}
+
+/* ═══════════ PRODUCT MODAL ═══════════ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,23,48,0.62);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--cream);
+  border-radius: 8px 8px 0 0;
+  max-height: 93%;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.5s var(--ease);
+  border-top: 0.5px solid var(--brass);
+}
+
+.modal-backdrop.open .modal-sheet {
+  transform: translateY(0);
+}
+
+.modal-handle {
+  width: 32px;
+  height: 3px;
+  background: var(--brass-pale);
+  border-radius: 2px;
+  margin: 13px auto 0;
+}
+
+.modal-img {
+  height: 230px;
+  margin: 22px 24px 0;
+  background: linear-gradient(135deg, var(--cream-deep), var(--cream), var(--cream-warm));
+  border: 0.5px solid var(--cream-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+  position: relative;
+}
+
+.modal-img-brand {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: var(--olive);
+  margin-bottom: 10px;
+}
+
+.modal-img-name {
+  font-family: var(--serif);
+  font-size: 34px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.04;
+}
+
+.modal-body { padding: 30px 26px 44px; }
+
+.modal-num {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+  margin-bottom: 16px;
+}
+
+.modal-brand {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.modal-name {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.02;
+  margin-bottom: 22px;
+}
+
+.modal-meta {
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.modal-meta::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  border-top: 0.5px solid var(--cream-shadow);
+  border-bottom: 0.5px solid var(--cream-shadow);
+}
+
+.modal-size {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--olive);
+}
+
+.modal-price {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--brass);
+}
+
+.modal-section {
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 0.5px solid var(--cream-shadow);
+}
+
+.modal-section:last-of-type { border-bottom: none; }
+
+.modal-section-label {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  color: var(--olive);
+  margin-bottom: 12px;
+}
+
+.modal-section-text {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.modal-section-text ul { list-style: none; }
+
+.modal-section-text li {
+  padding-left: 18px;
+  position: relative;
+  margin-bottom: 7px;
+}
+
+.modal-section-text li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 11px;
+  width: 4px;
+  height: 4px;
+  background: var(--brass);
+  transform: rotate(45deg);
+}
+
+.modal-section-text li b { font-weight: 600; }
+
+/* ═══════════ LETTER MODAL ═══════════ */
+.letter-modal-body { padding: 40px 32px 54px; }
+
+.letter-modal-name {
+  font-family: var(--serif);
+  font-size: 54px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 1px 0 rgba(244,239,228,0.8);
+}
+
+.letter-modal-arabic {
+  font-size: 26px;
+  color: var(--brass);
+  direction: rtl;
+  margin-bottom: 6px;
+}
+
+.letter-modal-meaning {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--olive);
+  margin-bottom: 14px;
+}
+
+.letter-modal-rule {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+.letter-modal-rule::before,
+.letter-modal-rule::after {
+  content: '';
+  height: 0.5px;
+  flex: 1;
+  background: var(--cream-shadow);
+}
+.letter-modal-rule span {
+  width: 4px;
+  height: 4px;
+  background: var(--brass);
+  transform: rotate(45deg);
+}
+
+.letter-modal-text p {
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.62;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+
+.letter-modal-text p em { font-style: italic; }
+
+.letter-modal-text p:first-child::first-letter {
+  font-size: 58px;
+  font-weight: 600;
+  float: left;
+  line-height: 0.82;
+  margin: 6px 8px 0 0;
+  color: var(--brass);
+}
+
+.letter-modal-sign {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 28px;
+}
+
+.letter-modal-meta {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  color: var(--olive);
+  margin-top: 8px;
+}
+
+/* ═══════════ ONBOARDING ═══════════ */
+.onboard {
+  position: fixed;
+  inset: 0;
+  background: var(--navy);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+
+.onboard.show {
+  display: flex;
+  opacity: 1;
+}
+
+.onboard.fading-out {
+  opacity: 0;
+}
+
+.onboard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: env(safe-area-inset-top, 16px) 24px 0;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 18px);
+  flex-shrink: 0;
+}
+
+.onboard-brand {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--cream);
+}
+
+.onboard-skip {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--brass-pale);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 4px;
+  letter-spacing: 0.02em;
+}
+
+.onboard-scroller {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.onboard-scroller::-webkit-scrollbar { display: none; }
+
+.onboard-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 36px 40px;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.onboard-slide::-webkit-scrollbar { display: none; }
+
+.onboard-symbol {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 36px;
+  color: var(--cream);
+  --symbol-soft-opacity: 0.4;
+}
+
+.onboard-symbol svg { display: block; width: 100%; height: 100%; }
+
+.onboard-eyebrow {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--brass-pale);
+  margin-bottom: 20px;
+}
+
+.onboard-eyebrow::after {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 0.5px;
+  background: var(--brass-pale);
+  margin: 10px auto 0;
+}
+
+.onboard-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--cream);
+  margin-bottom: 24px;
+  letter-spacing: -0.005em;
+}
+
+.onboard-text {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--cream-warm);
+  max-width: 360px;
+  margin: 0 auto;
+  opacity: 0.86;
+}
+
+.onboard-text b {
+  font-weight: 600;
+  color: var(--cream);
+  font-style: normal;
+}
+
+.onboard-text em {
+  font-style: italic;
+  color: var(--brass-pale);
+}
+
+/* Slide 2 — edit calendar mini */
+.onboard-cal {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 26px auto 0;
+  max-width: 320px;
+}
+
+.cal-cell {
+  aspect-ratio: 3 / 4;
+  border: 0.5px solid var(--brass);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  position: relative;
+  background: var(--navy);
+}
+
+.cal-cell.current {
+  background: var(--brass);
+}
+
+.cal-cell-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--brass-pale);
+  margin-bottom: 2px;
+}
+
+.cal-cell.current .cal-cell-num {
+  color: var(--cream);
+}
+
+.cal-cell-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cream-warm);
+  line-height: 1;
+}
+
+.cal-cell.current .cal-cell-name {
+  color: var(--cream);
+  font-weight: 600;
+}
+
+/* Slide 3 — collection illustration */
+.onboard-collection {
+  display: flex;
+  gap: 6px;
+  margin: 26px auto 0;
+  max-width: 320px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.col-tile {
+  width: 38px;
+  height: 54px;
+  border: 0.5px solid var(--brass-pale);
+  position: relative;
+  opacity: 0.35;
+}
+
+.col-tile.filled {
+  opacity: 1;
+  background: var(--brass);
+  border-color: var(--brass);
+}
+
+.col-tile.next {
+  opacity: 0.7;
+  border-color: var(--brass);
+  border-width: 0.5px;
+  border-style: dashed;
+}
+
+/* Bottom dots + nav */
+.onboard-bottom {
+  padding: 0 24px env(safe-area-inset-bottom, 24px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px);
+  flex-shrink: 0;
+}
+
+.onboard-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.onboard-dot {
+  width: 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  background: var(--brass-pale);
+  opacity: 0.35;
+  transition: opacity 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.onboard-dot.active {
+  background: var(--brass);
+  opacity: 1;
+}
+
+.onboard-cta {
+  width: 100%;
+  background: var(--cream);
+  color: var(--navy);
+  border: none;
+  padding: 17px 22px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+}
+
+.onboard-cta::before,
+.onboard-cta::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+}
+.onboard-cta::before {
+  top: -1px; left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+.onboard-cta::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+.onboard-cta-arrow {
+  font-style: normal;
+  font-size: 18px;
+}
+
+/* ═══════════ UPDATE AVAILABLE BANNER ═══════════ */
+.update-banner {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  background: var(--brass);
+  color: var(--cream);
+  padding: 14px 20px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  z-index: 55;
+  border: 0.5px solid var(--brass-pale);
+  box-shadow: 0 8px 24px rgba(20,34,63,0.22);
+  animation: rise 0.5s var(--ease) forwards;
+}
+
+.update-banner.show { display: flex; }
+
+.update-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.update-text b {
+  font-weight: 600;
+  font-style: normal;
+}
+
+.update-btn {
+  background: var(--cream);
+  color: var(--navy);
+  border: none;
+  padding: 9px 16px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.update-dismiss {
+  background: none;
+  border: none;
+  color: var(--cream);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+  font-family: var(--serif);
+  opacity: 0.7;
+}
+
+/* ─── Animations ─── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.stagger > * {
+  opacity: 0;
+  animation: rise 0.7s var(--ease) forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger > *:nth-child(8) { animation-delay: 0.4s; }
+.stagger > *:nth-child(9) { animation-delay: 0.45s; }
+.stagger > *:nth-child(10) { animation-delay: 0.5s; }
+.stagger > *:nth-child(11) { animation-delay: 0.55s; }
+.stagger > *:nth-child(12) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="safe-top"></div>
+
+  <!-- ═══════════ HOME · MAISON ═══════════ -->
+  <div class="screen active" id="screen-home">
+    <div class="topbar">
+      <div class="topbar-symbol">
+        <div class="symbol-mark">
+          <svg viewBox="258 171 731 844" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"><path fill="currentColor" d="M338.348541,981.463135 C376.530029,969.187866 409.315643,948.548096 438.218292,921.686829 C484.823151,878.373657 517.590637,825.614075 542.083130,767.379944 C569.148926,703.027466 584.276978,635.908875 587.688965,566.210693 C590.210144,514.707825 584.672180,464.040680 569.936584,414.550903 C553.912842,360.734253 528.089844,312.347473 489.224365,271.373962 C451.005188,231.081833 404.841614,205.314148 349.996368,195.555450 C343.644867,194.425308 337.215576,193.732529 331.038879,192.073929 C397.186493,193.144516 457.821594,212.124725 512.102844,250.120010 C567.021301,288.561340 602.816650,341.195892 623.839478,405.809052 C645.289917,342.023346 680.644714,289.212982 735.006531,250.405838 C789.188660,211.727005 850.098755,193.402130 916.042725,191.109741 C916.213745,191.703918 916.384766,192.298096 916.555847,192.892273 C915.073853,193.142258 913.600220,193.467911 912.108765,193.631348 C844.609497,201.028641 790.229553,232.636154 746.425293,283.604523 C705.375305,331.368103 680.949219,387.095520 668.117188,448.290771 C654.740051,512.085571 655.560547,575.958862 666.761597,639.971619 C678.031921,704.380554 698.931458,765.371704 730.971558,822.391541 C759.833740,873.755737 796.493774,918.342163 845.903870,951.464111 C881.411682,975.266663 920.603333,988.497253 963.164917,991.912231 C965.081543,992.066101 966.985901,992.371277 968.895996,992.605957 C968.897461,993.128174 968.898926,993.650391 968.900452,994.172607 C961.308350,994.550171 953.704956,995.405396 946.125916,995.226685 C901.638306,994.178162 860.069946,982.230469 821.013489,961.137756 C779.727478,938.841003 744.531494,909.098999 714.311829,873.394226 C676.447510,828.657166 648.240906,778.429810 629.679932,722.818909 C628.365356,718.880310 627.335205,714.841675 626.296021,710.817688 C625.298889,706.956604 624.462036,703.054199 622.768738,698.960022 C622.063477,701.892334 621.349670,704.822693 620.654419,707.757324 C614.044312,735.660034 602.619812,761.679443 589.563660,787.049988 C563.033203,838.603394 528.631226,884.052063 483.968628,921.265747 C433.288025,963.493835 376.086182,990.758240 309.318451,994.938782 C298.739685,995.601135 288.083740,995.031555 277.560455,994.068054 C297.697754,989.912964 317.835052,985.757874 338.348541,981.463135 z"/></svg>
+        </div>
+        <div class="topbar-wordmark">Saen</div>
+      </div>
+      <div class="topbar-meta">Tashkent · MMXXVI</div>
+    </div>
+
+    <div class="home-hero">
+      <div class="hero-eyebrow">Текущий выпуск</div>
+      <div class="hero-edit-num">Edit N°I</div>
+      <h1 class="hero-title">Hifz</h1>
+      <div class="hero-arabic">حفظ</div>
+      <div class="hero-theme">Первый холод</div>
+      <div class="hero-status">
+        <span class="status-dot"></span>
+        Открывается 1 ноября 2026
+      </div>
+
+      <div class="countdown" id="countdown">
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cd-days">—</div>
+          <div class="countdown-label">дней</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cd-hours">—</div>
+          <div class="countdown-label">часов</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cd-mins">—</div>
+          <div class="countdown-label">минут</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-ornament">
+      <span class="divider-fleuron"></span>
+      <span class="divider-fleuron-center"></span>
+      <span class="divider-fleuron"></span>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Письмо куратора</div>
+      <div class="curator-note">
+        В Ташкенте отопление включают в начале ноября. Воздух становится сухим раньше, чем мы успеваем заметить —
+        <span class="curator-note-excerpt">это видно по коже до того, как мы поймём, что что-то изменилось.</span>
+      </div>
+      <div class="curator-sign">D.</div>
+      <button class="text-link" onclick="openLetter('hifz')">
+        Читать письмо целиком
+        <span class="text-link-arrow">→</span>
+      </button>
+    </div>
+
+    <div class="divider-ornament">
+      <span class="divider-fleuron"></span>
+      <span class="divider-fleuron-center"></span>
+      <span class="divider-fleuron"></span>
+    </div>
+
+    <!-- Install card — appears only when installable & not yet installed -->
+    <div class="install-card" id="installCard">
+      <button class="install-card-dismiss" onclick="dismissInstall()" aria-label="Скрыть">×</button>
+      <div class="install-card-label">Saen на вашем экране</div>
+      <div class="install-card-title">Держите выпуск под рукой</div>
+      <div class="install-card-text" id="installCardText">
+        Добавьте Saen на домашний экран — приложение откроется в один тап, без браузера.
+      </div>
+      <button class="install-card-btn" id="installBtn" onclick="triggerInstall()">
+        Установить приложение
+        <span style="font-style:normal;">→</span>
+      </button>
+    </div>
+
+    <div class="divider-ornament" id="installDivider">
+      <span class="divider-fleuron"></span>
+      <span class="divider-fleuron-center"></span>
+      <span class="divider-fleuron"></span>
+    </div>
+
+    <div class="section" style="padding-bottom: 18px;">
+      <div class="section-label">В этом выпуске — семь позиций</div>
+    </div>
+    <div class="home-products" id="home-products"></div>
+  </div>
+
+  <!-- ═══════════ CATALOG · THE EDIT ═══════════ -->
+  <div class="screen" id="screen-catalog">
+    <div class="topbar">
+      <div class="topbar-symbol">
+        <div class="topbar-wordmark">The Edit</div>
+      </div>
+      <div class="topbar-meta">N°I</div>
+    </div>
+    <div class="catalog-head">
+      <h2 class="catalog-title">Hifz — Первый холод</h2>
+      <div class="catalog-sub">Семь позиций, доступных поштучно</div>
+    </div>
+    <div class="catalog-list" id="catalog-list"></div>
+  </div>
+
+  <!-- ═══════════ COLLECTION · CABINET ═══════════ -->
+  <div class="screen" id="screen-collection">
+    <div class="topbar">
+      <div class="topbar-symbol">
+        <div class="topbar-wordmark">Cabinet</div>
+      </div>
+      <div class="topbar-meta">0 / 12</div>
+    </div>
+    <div class="collection-head">
+      <h2 class="collection-title">Моя коллекция</h2>
+      <div class="collection-sub">Двенадцать выпусков · Ноябрь — Апрель</div>
+      <div class="collection-progress">
+        Собрано <b>0</b> из <b>12</b> выпусков. Коллекция собирается только хронологически — выпуск за выпуском.
+      </div>
+    </div>
+    <div class="edition-grid stagger" id="edition-grid"></div>
+  </div>
+
+  <!-- ═══════════ ORDERS · LEDGER ═══════════ -->
+  <div class="screen" id="screen-orders">
+    <div class="topbar">
+      <div class="topbar-symbol">
+        <div class="topbar-wordmark">Ledger</div>
+      </div>
+      <div class="topbar-meta">Пример</div>
+    </div>
+    <div class="orders-head">
+      <h2 class="orders-title">Мои предзаказы</h2>
+      <div class="orders-sub">Статус и история заказов</div>
+    </div>
+    <div id="orders-content"></div>
+  </div>
+
+  <!-- ═══════════ LETTERS ═══════════ -->
+  <div class="screen" id="screen-letters">
+    <div class="topbar">
+      <div class="topbar-symbol">
+        <div class="topbar-wordmark">Letters</div>
+      </div>
+      <div class="topbar-meta">Архив</div>
+    </div>
+    <div class="letters-head">
+      <h2 class="letters-title">Письма куратора</h2>
+      <div class="letters-sub">Одно письмо на каждый выпуск</div>
+    </div>
+    <div id="letters-list"></div>
+  </div>
+
+  <!-- ═══════════ FLOATING CART PILL ═══════════ -->
+  <div class="cart-pill" id="cartPill" onclick="openCheckout()">
+    <div class="cart-pill-left">
+      <div class="cart-pill-count" id="cartCount">0 позиций</div>
+      <div class="cart-pill-total" id="cartTotal">0 сум</div>
+    </div>
+    <div class="cart-pill-cta">
+      Оформить
+      <span class="cart-pill-cta-arrow">→</span>
+    </div>
+  </div>
+
+  <!-- ═══════════ BOTTOM NAV ═══════════ -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-screen="home">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 L12 3 L21 10.5 M5 9 V20 H19 V9"/></svg>
+      </div>
+      <div class="nav-label">Maison</div>
+    </button>
+    <button class="nav-item" data-screen="catalog">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M5 4 H19 M5 9 H19 M5 14 H19 M5 19 H14"/></svg>
+      </div>
+      <div class="nav-label">The Edit</div>
+    </button>
+    <button class="nav-item" data-screen="collection">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg>
+      </div>
+      <div class="nav-label">Cabinet</div>
+    </button>
+    <button class="nav-item" data-screen="orders">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 2 H18 V22 H6 Z M9 7 H15 M9 11 H15 M9 15 H13"/></svg>
+      </div>
+      <div class="nav-label">Ledger</div>
+    </button>
+    <button class="nav-item" data-screen="letters">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 5 H21 V19 H3 Z M3 5 L12 13 L21 5"/></svg>
+      </div>
+      <div class="nav-label">Letters</div>
+    </button>
+  </nav>
+</div>
+
+<!-- ═══════════ PRODUCT MODAL ═══════════ -->
+<div class="modal-backdrop" id="productModal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-img" id="modalImg"></div>
+    <div class="modal-body">
+      <div class="modal-num" id="modalNum"></div>
+      <div class="modal-brand" id="modalBrand"></div>
+      <h2 class="modal-name" id="modalName"></h2>
+      <div class="modal-meta">
+        <div class="modal-size" id="modalSize"></div>
+        <div class="modal-price" id="modalPrice"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Описание</div>
+        <div class="modal-section-text" id="modalDesc"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Ключевые ингредиенты</div>
+        <div class="modal-section-text" id="modalIngredients"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Текстура и применение</div>
+        <div class="modal-section-text" id="modalTexture"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Кому подходит</div>
+        <div class="modal-section-text" id="modalFor"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Происхождение</div>
+        <div class="modal-section-text" id="modalOrigin"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ LETTER MODAL ═══════════ -->
+<div class="modal-backdrop" id="letterModal" onclick="if(event.target===this) closeLetter()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="letter-modal-body">
+      <h2 class="letter-modal-name" id="letterName"></h2>
+      <div class="letter-modal-arabic" id="letterArabic"></div>
+      <div class="letter-modal-meaning" id="letterMeaning"></div>
+      <div class="letter-modal-rule"><span></span></div>
+      <div class="letter-modal-text" id="letterText"></div>
+      <div class="letter-modal-sign">D.</div>
+      <div class="letter-modal-meta">Saen — Tashkent · MMXXVI</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ iOS INSTALL GUIDE MODAL ═══════════ -->
+<div class="modal-backdrop" id="iosGuide" onclick="if(event.target===this) closeIosGuide()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="ios-guide-body">
+      <h2 class="ios-guide-title">Установить Saen</h2>
+      <div class="ios-guide-sub">Два шага в Safari</div>
+
+      <div class="ios-step">
+        <div class="ios-step-num">I</div>
+        <div class="ios-step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#9A7B4F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3 L12 15 M8 7 L12 3 L16 7"/>
+            <path d="M6 12 L6 20 L18 20 L18 12"/>
+          </svg>
+        </div>
+        <div class="ios-step-text">
+          Нажмите кнопку <b>«Поделиться»</b> внизу экрана Safari — квадрат со стрелкой вверх
+        </div>
+      </div>
+
+      <div class="ios-step">
+        <div class="ios-step-num">II</div>
+        <div class="ios-step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#9A7B4F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="3"/>
+            <path d="M12 8 L12 16 M8 12 L16 12"/>
+          </svg>
+        </div>
+        <div class="ios-step-text">
+          Выберите <b>«На экран „Домой"»</b> — Saen появится иконкой рядом с другими приложениями
+        </div>
+      </div>
+
+      <div class="ios-guide-note">
+        После установки Saen открывается как приложение — на весь экран, без панелей браузера.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CHECKOUT MODAL (4 шага) ═══════════ -->
+<div class="modal-backdrop" id="checkoutModal" onclick="if(event.target===this) closeCheckout()">
+  <div class="checkout-sheet">
+    <div class="checkout-head">
+      <div class="checkout-step-label" id="checkoutStepLabel">Шаг I из IV</div>
+      <button class="checkout-close" onclick="closeCheckout()" aria-label="Закрыть">×</button>
+    </div>
+    <div class="checkout-progress" id="checkoutProgress">
+      <div class="progress-bar"></div>
+      <div class="progress-bar"></div>
+      <div class="progress-bar"></div>
+      <div class="progress-bar"></div>
+    </div>
+
+    <div class="checkout-body" id="checkoutBody">
+      <!-- Step 1: Review -->
+      <div class="checkout-step" id="step1" style="display: block;">
+        <h2 class="checkout-step-title">Ваш предзаказ</h2>
+        <div class="checkout-step-sub">Edit N°I — Hifz</div>
+        <div id="reviewItems"></div>
+        <div class="review-total">
+          <div class="review-total-label">Итого</div>
+          <div class="review-total-value" id="reviewTotal">0 сум</div>
+        </div>
+        <div class="review-prepayment">
+          <b>Предоплата 50%</b> — для подтверждения предзаказа.
+          Остальное — при выдаче. Привозим из Дубая, ориентировочно 10—14 дней.
+        </div>
+      </div>
+
+      <!-- Step 2: Contact -->
+      <div class="checkout-step" id="step2" style="display: none;">
+        <h2 class="checkout-step-title">Как с вами связаться</h2>
+        <div class="checkout-step-sub">Имя и номер — для подтверждения заказа</div>
+        <div class="form-group">
+          <label class="form-label">Имя <span class="req">*</span></label>
+          <input type="text" class="form-input" id="formName" placeholder="Ваше имя" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Телефон <span class="req">*</span></label>
+          <input type="tel" class="form-input" id="formPhone" placeholder="+998 90 123 45 67" autocomplete="tel">
+          <div class="form-hint">Ташкент. Напишем в Telegram или позвоним</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span style="color:var(--olive); font-style:italic; font-size: 12px;">— по желанию</span></label>
+          <input type="email" class="form-input" id="formEmail" placeholder="you@example.com" autocomplete="email">
+          <div class="form-hint">Для письма куратора и подтверждения</div>
+        </div>
+      </div>
+
+      <!-- Step 3: Delivery -->
+      <div class="checkout-step" id="step3" style="display: none;">
+        <h2 class="checkout-step-title">Как получить</h2>
+        <div class="checkout-step-sub">Доставка по Ташкенту или самовывоз</div>
+        <div class="choice-group">
+          <div class="choice-card selected" data-choice="delivery" onclick="selectDelivery('delivery')">
+            <div class="choice-title">Доставка курьером</div>
+            <div class="choice-sub">По Ташкенту · в день выдачи · бесплатно</div>
+          </div>
+          <div class="choice-card" data-choice="pickup" onclick="selectDelivery('pickup')">
+            <div class="choice-title">Самовывоз</div>
+            <div class="choice-sub">Центр Ташкента · уточним адрес в Telegram</div>
+          </div>
+        </div>
+        <div id="addressBlock" class="form-group" style="margin-top: 22px;">
+          <label class="form-label">Адрес доставки <span class="req">*</span></label>
+          <input type="text" class="form-input" id="formAddress" placeholder="Улица, дом, квартира">
+          <div class="form-hint">Подробности — район, ориентир — добавьте здесь</div>
+        </div>
+      </div>
+
+      <!-- Step 4: Confirmation -->
+      <div class="checkout-step" id="step4" style="display: none;">
+        <div class="confirm-icon">
+          <svg viewBox="0 0 24 24"><path d="M5 12 L10 17 L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2 class="confirm-title">Предзаказ оформлен</h2>
+        <div class="confirm-order-id" id="confirmOrderId">№ 0000</div>
+        <p class="confirm-text">
+          Мы свяжемся с вами в течение 24 часов, пришлём реквизиты для предоплаты
+          и подтвердим срок выдачи.
+        </p>
+        <div class="confirm-divider"><span></span></div>
+        <p class="confirm-text" style="font-size: 15px; color: var(--olive); font-style: italic;">
+          Спасибо, что вы среди первых двадцати пяти.
+        </p>
+      </div>
+    </div>
+
+    <div class="checkout-action" id="checkoutAction">
+      <button class="btn-back" id="btnBack" onclick="backStep()" style="display: none;">Назад</button>
+      <button class="btn-primary" id="btnNext" onclick="nextStep()">
+        <span id="btnNextText">Далее</span>
+        <span style="font-style:normal;">→</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ONBOARDING (первый запуск) ═══════════ -->
+<div class="onboard" id="onboard">
+  <div class="onboard-top">
+    <div class="onboard-brand">Saen</div>
+    <button class="onboard-skip" onclick="finishOnboard()">Пропустить</button>
+  </div>
+
+  <div class="onboard-scroller" id="onboardScroller">
+    <!-- Slide 1: What is Saen -->
+    <div class="onboard-slide">
+      <div class="onboard-symbol"><svg viewBox="258 171 731 844" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"><path fill="currentColor" d="M338.348541,981.463135 C376.530029,969.187866 409.315643,948.548096 438.218292,921.686829 C484.823151,878.373657 517.590637,825.614075 542.083130,767.379944 C569.148926,703.027466 584.276978,635.908875 587.688965,566.210693 C590.210144,514.707825 584.672180,464.040680 569.936584,414.550903 C553.912842,360.734253 528.089844,312.347473 489.224365,271.373962 C451.005188,231.081833 404.841614,205.314148 349.996368,195.555450 C343.644867,194.425308 337.215576,193.732529 331.038879,192.073929 C397.186493,193.144516 457.821594,212.124725 512.102844,250.120010 C567.021301,288.561340 602.816650,341.195892 623.839478,405.809052 C645.289917,342.023346 680.644714,289.212982 735.006531,250.405838 C789.188660,211.727005 850.098755,193.402130 916.042725,191.109741 C916.213745,191.703918 916.384766,192.298096 916.555847,192.892273 C915.073853,193.142258 913.600220,193.467911 912.108765,193.631348 C844.609497,201.028641 790.229553,232.636154 746.425293,283.604523 C705.375305,331.368103 680.949219,387.095520 668.117188,448.290771 C654.740051,512.085571 655.560547,575.958862 666.761597,639.971619 C678.031921,704.380554 698.931458,765.371704 730.971558,822.391541 C759.833740,873.755737 796.493774,918.342163 845.903870,951.464111 C881.411682,975.266663 920.603333,988.497253 963.164917,991.912231 C965.081543,992.066101 966.985901,992.371277 968.895996,992.605957 C968.897461,993.128174 968.898926,993.650391 968.900452,994.172607 C961.308350,994.550171 953.704956,995.405396 946.125916,995.226685 C901.638306,994.178162 860.069946,982.230469 821.013489,961.137756 C779.727478,938.841003 744.531494,909.098999 714.311829,873.394226 C676.447510,828.657166 648.240906,778.429810 629.679932,722.818909 C628.365356,718.880310 627.335205,714.841675 626.296021,710.817688 C625.298889,706.956604 624.462036,703.054199 622.768738,698.960022 C622.063477,701.892334 621.349670,704.822693 620.654419,707.757324 C614.044312,735.660034 602.619812,761.679443 589.563660,787.049988 C563.033203,838.603394 528.631226,884.052063 483.968628,921.265747 C433.288025,963.493835 376.086182,990.758240 309.318451,994.938782 C298.739685,995.601135 288.083740,995.031555 277.560455,994.068054 C297.697754,989.912964 317.835052,985.757874 338.348541,981.463135 z"/><path fill="currentColor" opacity="0.35" d="M358.846924,691.182556 C369.981964,699.916504 380.803650,708.478638 391.758636,716.866699 C394.453766,718.930420 394.837921,721.359070 393.212311,723.768982 C391.414124,726.434753 388.699677,726.259521 386.216400,724.364380 C375.770844,716.392334 364.945526,708.859253 354.995972,700.308167 C335.120605,683.226440 318.976990,662.944946 306.402679,639.935303 C294.234924,617.669739 286.369781,593.965698 282.934418,568.757996 C279.117126,540.747803 281.826813,513.347961 289.991180,486.424225 C299.116119,456.332855 314.364746,429.668793 335.227295,406.141510 C348.890869,390.732697 364.249695,377.292755 381.094147,365.501648 C381.775970,365.024353 382.423706,364.493256 383.131073,364.058350 C385.709442,362.473022 388.329651,362.184113 390.159149,364.955566 C391.943451,367.658600 390.822083,369.857208 388.367249,371.795868 C380.014191,378.392670 371.630371,384.961639 363.502075,391.829773 C344.994324,407.468262 330.111694,426.160095 318.013031,447.080505 C305.199646,469.236694 296.661133,493.033905 293.309692,518.360718 C288.597534,553.970215 293.696777,588.362671 308.501068,621.217285 C320.498138,647.841980 337.457642,670.886169 358.846924,691.182556 z"/><path fill="currentColor" opacity="0.35" d="M930.921570,653.903931 C912.380249,681.469849 889.567383,704.247559 862.231445,722.509949 C859.481018,724.347412 856.880920,725.829834 854.495544,722.485352 C851.922424,718.877747 854.493347,716.541443 857.189697,714.680786 C872.738525,703.950806 886.960205,691.664978 899.681458,677.734863 C927.420837,647.359375 945.942444,612.169800 951.753967,571.264832 C959.602661,516.021790 944.967041,466.502655 911.115417,422.430206 C895.568054,402.188660 877.031921,385.122101 856.044861,370.690735 C853.062988,368.640289 851.775696,366.182770 853.602722,363.161957 C855.731689,359.641937 858.611084,361.012085 861.312622,362.881744 C896.705261,387.376251 925.587158,417.666595 944.238403,456.869141 C954.540649,478.523224 960.872253,501.323883 963.108521,525.302002 C966.499634,561.662476 960.008301,596.218140 944.672302,629.154785 C940.749512,637.579590 935.652283,645.457458 930.921570,653.903931 z"/></svg></div>
+      <div class="onboard-eyebrow">Saen — Tashkent · MMXXVI</div>
+      <h1 class="onboard-title">Кураторский<br>дом красоты</h1>
+      <p class="onboard-text">
+        Каждый месяц — один <b>выпуск из&nbsp;семи позиций</b> премиальной косметики,
+        отобранных и привезённых из&nbsp;Дубая.
+        Не магазин, а&nbsp;<em>тщательно собранная коллекция.</em>
+      </p>
+    </div>
+
+    <!-- Slide 2: How editions work -->
+    <div class="onboard-slide">
+      <div class="onboard-eyebrow">Двенадцать выпусков</div>
+      <h1 class="onboard-title">Один месяц —<br>один выпуск</h1>
+      <p class="onboard-text">
+        С ноября по&nbsp;апрель — двенадцать именных выпусков. У&nbsp;каждого свой <em>сезон, цвет и&nbsp;характер.</em>
+      </p>
+      <div class="onboard-cal">
+        <div class="cal-cell current"><div class="cal-cell-num">N°I</div><div class="cal-cell-name">Hifz</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°II</div><div class="cal-cell-name">Tuhfa</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°III</div><div class="cal-cell-name">Nūr</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°IV</div><div class="cal-cell-name">Safa</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°V</div><div class="cal-cell-name">Cheshmeh</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°VI</div><div class="cal-cell-name">Khafiya</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°VII</div><div class="cal-cell-name">Mehr</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°VIII</div><div class="cal-cell-name">Khamsin</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°IX</div><div class="cal-cell-name">Navrūz</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°X</div><div class="cal-cell-name">Shams</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°XI</div><div class="cal-cell-name">Safar</div></div>
+        <div class="cal-cell "><div class="cal-cell-num">N°XII</div><div class="cal-cell-name">Awwal</div></div>
+      </div>
+    </div>
+
+    <!-- Slide 3: Collection -->
+    <div class="onboard-slide">
+      <div class="onboard-eyebrow">Cabinet</div>
+      <h1 class="onboard-title">Коллекция,<br>которая&nbsp;растёт</h1>
+      <p class="onboard-text">
+        Заказывая выпуск — вы получаете не&nbsp;только продукты, но и&nbsp;<em>место в&nbsp;коллекции.</em>
+        Cabinet собирается хронологически, выпуск за&nbsp;выпуском.
+      </p>
+      <div class="onboard-collection">
+        <div class="col-tile filled"></div>
+        <div class="col-tile next"></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+        <div class="col-tile "></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="onboard-bottom">
+    <div class="onboard-dots">
+      <div class="onboard-dot active" data-slide="0"></div>
+      <div class="onboard-dot" data-slide="1"></div>
+      <div class="onboard-dot" data-slide="2"></div>
+    </div>
+    <button class="onboard-cta" onclick="onboardNext()">
+      <span id="onboardCtaText">Далее</span>
+      <span class="onboard-cta-arrow" id="onboardCtaArrow">→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════ UPDATE AVAILABLE BANNER ═══════════ -->
+<div class="update-banner" id="updateBanner">
+  <div class="update-text"><b>Новая версия</b> приложения готова</div>
+  <button class="update-btn" onclick="applyUpdate()">Обновить</button>
+  <button class="update-dismiss" onclick="document.getElementById('updateBanner').classList.remove('show')" aria-label="Скрыть">×</button>
+</div>
+
+<div class="paper-grain"></div>
+<div class="vignette"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// SAEN PWA · v2 — Data & Logic
+// ═══════════════════════════════════════════════
+
+const PRODUCTS = [
+  {
+    n: 'I', brand: 'Augustinus Bader', name: 'The Rich Cream',
+    cat: 'Skincare', size: '15 ml · travel', price: '~1 887 000 сум',
+    desc: 'Хитовый премиум-крем последних двух лет. Густая, восстанавливающая текстура для холодного сезона. Один из немногих продуктов с реальной клинической доказательной базой.',
+    ingredients: ['<b>TFC8&#174;</b> — патентованный комплекс из 40+ молекул', 'Evening primrose oil — восстановление барьера', 'Avocado oil — омега-6 для эластичности'],
+    texture: 'Густой soufflé-cream, тает в плотную плёнку, впитывается за 2–3 минуты. Без отдушек. Утром и вечером, по 2 нажатия.',
+    forWhom: ['Сухая, обезвоженная кожа', '30+ с признаками старения', 'Холодный сезон, отопительный период'],
+    origin: 'Германия · Привозим из Sephora Middle East. Документы об оригинальности прикладываем к заказу.'
+  },
+  {
+    n: 'II', brand: 'Sulwhasoo', name: 'First Care Activating Serum',
+    cat: 'Skincare', size: '30 ml', price: '~1 690 000 сум',
+    desc: 'Корейская династическая формула 1997 года на основе традиционных трав. Подготавливает кожу к восприятию остального ухода — наносится первым шагом.',
+    ingredients: ['JAUM Balancing Complex — пять корейских трав', 'Pine mushroom extract', 'White lily — выравнивание тона'],
+    texture: 'Лёгкая, чуть маслянистая эссенция. 1–2 капли в ладонь, прикладывается к лицу. Не липкая, впитывается мгновенно.',
+    forWhom: ['Все типы кожи, особенно тусклая', 'Регулярное использование утром и вечером', 'Знакомство с K-beauty уходом'],
+    origin: 'Южная Корея · Привозим из официального Sulwhasoo boutique в Dubai Mall.'
+  },
+  {
+    n: 'III', brand: 'SK-II', name: 'Facial Treatment Essence',
+    cat: 'Skincare', size: '75 ml', price: '~2 287 000 сум',
+    desc: 'Легендарная Pitera эссенция, открытая в 1980-х в японской саке-варне. Более 50 микронутриентов, поддерживающих естественное обновление кожи.',
+    ingredients: ['<b>Pitera</b> — ферментированный галактомицес (90%+)', 'Аминокислоты — питание', 'Органические кислоты — мягкое обновление'],
+    texture: 'Прозрачная водянистая эссенция с лёгким ароматом ферментации. 4–5 капель, похлопывающими движениями. Утром и вечером.',
+    forWhom: ['Тусклая, неровная по тону кожа', '25+, профилактика старения', 'Любители японского skincare'],
+    origin: 'Япония · Привозим из Sephora Middle East. Запах ферментации — норма.'
+  },
+  {
+    n: 'IV', brand: 'Drunk Elephant', name: 'Lala Retro Whipped Cream',
+    cat: 'Skincare', size: '50 ml', price: '~1 391 000 сум',
+    desc: 'Восстановление барьера с использованием шести экзотических масел. Виральный продукт в TikTok skincare-сегменте. Философия «6 free».',
+    ingredients: ['Шесть масел: marula, mongongo, baobab и др.', 'Ceramide complex — восстановление барьера', 'Niacinamide — успокаивание'],
+    texture: 'Кремово-взбитая консистенция, переходит в шёлковую плёнку. Не оставляет жирного блеска. Вечером, в холодный сезон — и утром.',
+    forWhom: ['Сухая и очень сухая кожа', 'Нарушенный барьер', 'Любители clean beauty без silicones'],
+    origin: 'США · Привозим из Sephora Middle East.'
+  },
+  {
+    n: 'V', brand: 'Diptyque', name: 'Baies — свеча',
+    cat: 'Home', size: '70 g · 25 часов', price: '~894 000 сум',
+    desc: 'Создана в 1968 году — одна из первых свечей Diptyque и до сих пор самая продаваемая. Аромат чёрной смородины и болгарской розы.',
+    ingredients: ['Натуральный воск', 'Хлопковый фитиль', 'Чёрная смородина (top)', 'Болгарская роза (heart)'],
+    texture: 'Горит ровным пламенем без копоти. Аромат наполняет комнату через 10–15 минут. Перед первым зажжением — час горения для ровного воска.',
+    forWhom: ['Любители читать дома со свечой', 'Универсальный подарок', 'Создание atmosphere для встреч'],
+    origin: 'Франция · Производство в Бретани. Привозим из Diptyque boutique в Dubai Mall.'
+  },
+  {
+    n: 'VI', brand: 'Byredo', name: 'Mojave Ghost',
+    cat: 'Fragrance', size: '50 ml · EDP', price: '~3 974 000 сум',
+    desc: 'Создан Беном Горэмом в 2014 году. Самый продаваемый аромат Byredo всех времён. Унисекс. Назван в честь цветка пустыни Мохаве.',
+    ingredients: ['<b>Top:</b> Sapodilla, Ambrette', '<b>Heart:</b> Magnolia, Violet, Sandalwood', '<b>Base:</b> Cedarwood, Vetiver, Musk'],
+    texture: 'Открывается фруктово-древесными нотами, через 20 минут — тёплая sandalwood-база. Стойкость 6–8 часов. Шлейф мягкий, близкая аура.',
+    forWhom: ['Любители унисекс ароматов', 'Те, кто не хочет «громкий» парфюм', 'Поиск signature scent'],
+    origin: 'Швеция · Создан в Стокгольме, разлив в Италии. Привозим из Boutique 1 в Dubai.'
+  },
+  {
+    n: 'VII', brand: 'Aesop', name: 'Resurrection Hand Balm',
+    cat: 'Body', size: '75 ml', price: '~695 000 сум',
+    desc: 'Самый продаваемый продукт Aesop. Подходит как первое знакомство с брендом. Густой, ароматный, с травяной нотой rosemary, mandarin и cedar.',
+    ingredients: ['Mandarin Rind — освежающий цитрус', 'Rosemary Leaf — травяная теплота', 'Shea Butter — питание'],
+    texture: 'Плотный крем средней густоты. Не оставляет жирного следа. Аромат держится около часа. Капля растирается между ладонями.',
+    forWhom: ['Знакомство с миром Aesop', 'Популярный подарок', 'Сухие руки после частого мытья'],
+    origin: 'Австралия · Производство в Мельбурне. Привозим из Aesop boutique в The Dubai Mall.'
+  }
+];
+
+// Each edition carries its own accent — patinated for the old-money palette.
+// accent = main brass, soft = pale ring/detail tone.
+const EDITIONS = [
+  { num: 'I',    name: 'Hifz',     arabic: 'حفظ',    theme: 'Первый холод',          status: 'current', accent: '#9A7B4F', soft: '#C7B48C' },
+  { num: 'II',   name: 'Tuhfa',    arabic: 'تحفة',   theme: 'Подарки до конца года',  status: 'locked',  accent: '#7B3B40', soft: '#B08A8D' },
+  { num: 'III',  name: 'Nūr',      arabic: 'نور',    theme: 'Новогодний макияж',      status: 'locked',  accent: '#B89A5E', soft: '#D6C79E' },
+  { num: 'IV',   name: 'Safa',     arabic: 'صفاء',   theme: 'Сброс',                 status: 'locked',  accent: '#7E8E76', soft: '#AFB8A8' },
+  { num: 'V',    name: 'Cheshmeh', arabic: 'چشمه',   theme: 'Зимняя гидратация',      status: 'locked',  accent: '#6E8597', soft: '#A6B3BD' },
+  { num: 'VI',   name: 'Khafiya',  arabic: 'خفية',   theme: 'Underrated',            status: 'locked',  accent: '#A06D4C', soft: '#C7A88E' },
+  { num: 'VII',  name: 'Mehr',     arabic: 'مهر',    theme: 'Валентин',              status: 'locked',  accent: '#A6849A', soft: '#C9B4C2' },
+  { num: 'VIII', name: 'Khamsin',  arabic: 'خمسين',  theme: 'Пыльный сезон',          status: 'locked',  accent: '#B0883F', soft: '#D0B583' },
+  { num: 'IX',   name: 'Navrūz',   arabic: 'نوروز',  theme: 'Весна',                 status: 'locked',  accent: '#8B9A6E', soft: '#B5BFA3' },
+  { num: 'X',    name: 'Shams',    arabic: 'شمس',    theme: 'Подготовка к лету',      status: 'locked',  accent: '#BCA06A', soft: '#D8C7A0' },
+  { num: 'XI',   name: 'Safar',    arabic: 'سفر',    theme: 'Travel & Fragrance',     status: 'locked',  accent: '#5F7E8C', soft: '#A0B0B8' },
+  { num: 'XII',  name: 'Awwal',    arabic: 'أول',    theme: 'Юбилейный',             status: 'locked',  accent: '#4A5878', soft: '#9098AC' }
+];
+
+// The edition currently "live" in the app — drives the whole colour theme.
+const CURRENT_EDIT_INDEX = 0;
+
+// Apply an edition's accent across the whole app via CSS variables.
+function applyEditTheme(idx) {
+  const e = EDITIONS[idx];
+  if (!e) return;
+  const root = document.documentElement;
+  root.style.setProperty('--brass', e.accent);
+  root.style.setProperty('--brass-pale', e.soft);
+  // theme-color meta for the browser chrome
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', '#14223F');
+}
+
+const LETTERS = {
+  hifz: {
+    name: 'Hifz', arabic: 'حفظ', meaning: 'Защита · Сохранение',
+    text: [
+      'В Ташкенте отопление включают в начале ноября. Воздух становится сухим раньше, чем мы успеваем заметить — это видно по коже до того, как мы поймём, что что-то изменилось.',
+      'Этот выпуск — не про красоту. Он про <em>защиту</em>. Семь позиций, которые мы выбрали для одной задачи — сохранить барьер до весны.',
+      'В арабском «hifz» означает не «маска» и не «крем». Это слово используют когда говорят о хранении старых книг, о памяти, о вещах, которые нужно беречь намеренно.',
+      'Это первый выпуск Saen. Мы открываем его именно с этого слова — потому что так начинается всё, что мы планируем делать дальше.',
+      'Спасибо, что вы среди первых двадцати пяти.'
+    ]
+  }
+};
+
+function renderHomeProducts() {
+  const el = document.getElementById('home-products');
+  el.innerHTML = PRODUCTS.map((p, i) => `
+    <div class="product-preview-item" onclick="openProduct(${i})">
+      <div class="pp-num">${p.n}</div>
+      <div class="pp-body">
+        <div class="pp-brand">${p.brand}</div>
+        <div class="pp-name">${p.name}</div>
+      </div>
+      <div class="pp-price">${p.price.replace('~','').replace(' сум','')}</div>
+    </div>
+  `).join('');
+}
+
+function renderCatalog() {
+  const el = document.getElementById('catalog-list');
+  el.innerHTML = PRODUCTS.map((p, i) => {
+    const isSelected = cart.has(i);
+    return `
+    <div class="catalog-card ${isSelected ? 'selected' : ''}" data-idx="${i}">
+      <div class="cc-num" onclick="openProduct(${i})">${p.n}</div>
+      <div class="cc-body" onclick="openProduct(${i})">
+        <div class="cc-cat">${p.cat}</div>
+        <div class="cc-brand">${p.brand}</div>
+        <div class="cc-name">${p.name}</div>
+        <div class="cc-meta">
+          <div class="cc-size">${p.size}</div>
+          <div class="cc-price">${p.price}</div>
+        </div>
+      </div>
+      <button class="cc-toggle" onclick="event.stopPropagation(); cart.toggle(${i})" aria-label="${isSelected ? 'Убрать' : 'Добавить'}">
+        ${isSelected ? '✓' : '+'}
+      </button>
+    </div>
+  `;
+  }).join('');
+}
+
+const medallionSvg = `<svg viewBox="258 171 731 844" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"><path fill="currentColor" d="M338.348541,981.463135 C376.530029,969.187866 409.315643,948.548096 438.218292,921.686829 C484.823151,878.373657 517.590637,825.614075 542.083130,767.379944 C569.148926,703.027466 584.276978,635.908875 587.688965,566.210693 C590.210144,514.707825 584.672180,464.040680 569.936584,414.550903 C553.912842,360.734253 528.089844,312.347473 489.224365,271.373962 C451.005188,231.081833 404.841614,205.314148 349.996368,195.555450 C343.644867,194.425308 337.215576,193.732529 331.038879,192.073929 C397.186493,193.144516 457.821594,212.124725 512.102844,250.120010 C567.021301,288.561340 602.816650,341.195892 623.839478,405.809052 C645.289917,342.023346 680.644714,289.212982 735.006531,250.405838 C789.188660,211.727005 850.098755,193.402130 916.042725,191.109741 C916.213745,191.703918 916.384766,192.298096 916.555847,192.892273 C915.073853,193.142258 913.600220,193.467911 912.108765,193.631348 C844.609497,201.028641 790.229553,232.636154 746.425293,283.604523 C705.375305,331.368103 680.949219,387.095520 668.117188,448.290771 C654.740051,512.085571 655.560547,575.958862 666.761597,639.971619 C678.031921,704.380554 698.931458,765.371704 730.971558,822.391541 C759.833740,873.755737 796.493774,918.342163 845.903870,951.464111 C881.411682,975.266663 920.603333,988.497253 963.164917,991.912231 C965.081543,992.066101 966.985901,992.371277 968.895996,992.605957 C968.897461,993.128174 968.898926,993.650391 968.900452,994.172607 C961.308350,994.550171 953.704956,995.405396 946.125916,995.226685 C901.638306,994.178162 860.069946,982.230469 821.013489,961.137756 C779.727478,938.841003 744.531494,909.098999 714.311829,873.394226 C676.447510,828.657166 648.240906,778.429810 629.679932,722.818909 C628.365356,718.880310 627.335205,714.841675 626.296021,710.817688 C625.298889,706.956604 624.462036,703.054199 622.768738,698.960022 C622.063477,701.892334 621.349670,704.822693 620.654419,707.757324 C614.044312,735.660034 602.619812,761.679443 589.563660,787.049988 C563.033203,838.603394 528.631226,884.052063 483.968628,921.265747 C433.288025,963.493835 376.086182,990.758240 309.318451,994.938782 C298.739685,995.601135 288.083740,995.031555 277.560455,994.068054 C297.697754,989.912964 317.835052,985.757874 338.348541,981.463135 z"/></svg>`;
+const lockSvg = `<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" stroke="#A8A290" stroke-width="1.25"/><path d="M8 11 V7 A4 4 0 0 1 16 7 V11" stroke="#A8A290" stroke-width="1.25"/></svg>`;
+
+function renderCollection() {
+  const el = document.getElementById('edition-grid');
+  el.innerHTML = EDITIONS.map(e => {
+    const isCurrent = e.status === 'current';
+    // Per-tile accent — each edition shows its own colour, even when locked.
+    const med = `<svg viewBox="258 171 731 844" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"><path fill="${e.accent}" d="M338.348541,981.463135 C376.530029,969.187866 409.315643,948.548096 438.218292,921.686829 C484.823151,878.373657 517.590637,825.614075 542.083130,767.379944 C569.148926,703.027466 584.276978,635.908875 587.688965,566.210693 C590.210144,514.707825 584.672180,464.040680 569.936584,414.550903 C553.912842,360.734253 528.089844,312.347473 489.224365,271.373962 C451.005188,231.081833 404.841614,205.314148 349.996368,195.555450 C343.644867,194.425308 337.215576,193.732529 331.038879,192.073929 C397.186493,193.144516 457.821594,212.124725 512.102844,250.120010 C567.021301,288.561340 602.816650,341.195892 623.839478,405.809052 C645.289917,342.023346 680.644714,289.212982 735.006531,250.405838 C789.188660,211.727005 850.098755,193.402130 916.042725,191.109741 C916.213745,191.703918 916.384766,192.298096 916.555847,192.892273 C915.073853,193.142258 913.600220,193.467911 912.108765,193.631348 C844.609497,201.028641 790.229553,232.636154 746.425293,283.604523 C705.375305,331.368103 680.949219,387.095520 668.117188,448.290771 C654.740051,512.085571 655.560547,575.958862 666.761597,639.971619 C678.031921,704.380554 698.931458,765.371704 730.971558,822.391541 C759.833740,873.755737 796.493774,918.342163 845.903870,951.464111 C881.411682,975.266663 920.603333,988.497253 963.164917,991.912231 C965.081543,992.066101 966.985901,992.371277 968.895996,992.605957 C968.897461,993.128174 968.898926,993.650391 968.900452,994.172607 C961.308350,994.550171 953.704956,995.405396 946.125916,995.226685 C901.638306,994.178162 860.069946,982.230469 821.013489,961.137756 C779.727478,938.841003 744.531494,909.098999 714.311829,873.394226 C676.447510,828.657166 648.240906,778.429810 629.679932,722.818909 C628.365356,718.880310 627.335205,714.841675 626.296021,710.817688 C625.298889,706.956604 624.462036,703.054199 622.768738,698.960022 C622.063477,701.892334 621.349670,704.822693 620.654419,707.757324 C614.044312,735.660034 602.619812,761.679443 589.563660,787.049988 C563.033203,838.603394 528.631226,884.052063 483.968628,921.265747 C433.288025,963.493835 376.086182,990.758240 309.318451,994.938782 C298.739685,995.601135 288.083740,995.031555 277.560455,994.068054 C297.697754,989.912964 317.835052,985.757874 338.348541,981.463135 z"/></svg>`;
+    return `
+    <div class="edition-tile ${isCurrent ? 'unlocked' : 'locked'}"
+         style="--tile-accent:${e.accent}; --tile-soft:${e.soft};"
+         ${isCurrent ? `onclick="goToScreen('catalog')"` : ''}>
+      ${isCurrent ? '<div class="et-status-tag">Текущий</div>' : ''}
+      <span class="filet filet-tl"></span>
+      <span class="filet filet-bl"></span>
+      <div class="et-top">
+        <div class="et-num">N°${e.num}</div>
+        ${isCurrent
+          ? `<div class="et-medallion">${med}</div>`
+          : `<div class="et-lock">${lockSvg}</div>`}
+      </div>
+      <div class="et-bottom">
+        <div class="et-arabic">${e.arabic}</div>
+        <div class="et-name">${e.name}</div>
+        <div class="et-theme">${e.theme}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderOrders() {
+  const el = document.getElementById('orders-content');
+  orders.load();
+
+  // Format thousands with thin space
+  const fmt = (n) => Math.round(n).toLocaleString('ru-RU').replace(/,/g, ' ');
+
+  // Format date as "1 ноября 2026"
+  const monthsRu = ['января','февраля','марта','апреля','мая','июня',
+                    'июля','августа','сентября','октября','ноября','декабря'];
+  const fmtDate = (ts) => {
+    const d = new Date(ts);
+    return `${d.getDate()} ${monthsRu[d.getMonth()]} ${d.getFullYear()}`;
+  };
+
+  let html = '';
+
+  // Render user's actual orders first
+  if (orders.list.length > 0) {
+    orders.list.slice().reverse().forEach(o => {
+      const items = o.items.map(it => `${it.brand} · ${it.name}`).join('<br>');
+      const prepayment = Math.round(o.total / 2);
+      html += `
+      <div class="order-card">
+        <span class="filet filet-tl"></span>
+        <span class="filet filet-tr"></span>
+        <span class="filet filet-bl"></span>
+        <span class="filet filet-br"></span>
+        <div class="order-card-head">
+          <div class="oc-edit">${o.editFull}</div>
+          <div class="oc-id">№ ${o.id}</div>
+        </div>
+        <div class="order-card-body">
+          <div class="oc-items">${items}</div>
+          <div class="oc-total">
+            <div class="oc-total-label">Предоплата 50%</div>
+            <div class="oc-total-value">${fmt(prepayment)} сум</div>
+          </div>
+          <div class="tracker">
+            <div class="tracker-step current">
+              <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+              <div class="tracker-body">
+                <div class="tracker-label">Предзаказ оформлен</div>
+                <div class="tracker-date">${fmtDate(o.createdAt)}</div>
+              </div>
+            </div>
+            <div class="tracker-step">
+              <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+              <div class="tracker-body">
+                <div class="tracker-label">Предоплата</div>
+                <div class="tracker-date">Ожидает реквизитов</div>
+              </div>
+            </div>
+            <div class="tracker-step">
+              <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+              <div class="tracker-body">
+                <div class="tracker-label">Закупка и доставка из Дубая</div>
+                <div class="tracker-date">—</div>
+              </div>
+            </div>
+            <div class="tracker-step">
+              <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+              <div class="tracker-body">
+                <div class="tracker-label">Сборка коробки</div>
+                <div class="tracker-date">—</div>
+              </div>
+            </div>
+            <div class="tracker-step">
+              <div class="tracker-rail"><div class="tracker-dot"></div></div>
+              <div class="tracker-body">
+                <div class="tracker-label">${o.delivery.type === 'pickup' ? 'Готов к выдаче' : 'Доставка курьером'}</div>
+                <div class="tracker-date">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    });
+  } else {
+    // Demo card (fallback when no real orders yet)
+    html = `
+    <div class="order-card">
+      <span class="filet filet-tl"></span>
+      <span class="filet filet-tr"></span>
+      <span class="filet filet-bl"></span>
+      <span class="filet filet-br"></span>
+      <div class="order-card-head">
+        <div class="oc-edit">Edit N°I — Hifz</div>
+        <div class="oc-id">№ 0042</div>
+      </div>
+      <div class="order-card-body">
+        <div class="oc-items">
+          Augustinus Bader · The Rich Cream<br>
+          Byredo · Mojave Ghost<br>
+          Diptyque · Baies свеча
+        </div>
+        <div class="oc-total">
+          <div class="oc-total-label">Предоплата 50%</div>
+          <div class="oc-total-value">3 377 500 сум</div>
+        </div>
+        <div class="tracker">
+          <div class="tracker-step done">
+            <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+            <div class="tracker-body">
+              <div class="tracker-label">Предзаказ оформлен</div>
+              <div class="tracker-date">1 ноября 2026</div>
+            </div>
+          </div>
+          <div class="tracker-step done">
+            <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+            <div class="tracker-body">
+              <div class="tracker-label">Предоплата получена</div>
+              <div class="tracker-date">1 ноября 2026</div>
+            </div>
+          </div>
+          <div class="tracker-step current">
+            <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+            <div class="tracker-body">
+              <div class="tracker-label">Закупка и доставка из Дубая</div>
+              <div class="tracker-date">Ожидается 10–14 ноября</div>
+            </div>
+          </div>
+          <div class="tracker-step">
+            <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
+            <div class="tracker-body">
+              <div class="tracker-label">Сборка коробки</div>
+              <div class="tracker-date">—</div>
+            </div>
+          </div>
+          <div class="tracker-step">
+            <div class="tracker-rail"><div class="tracker-dot"></div></div>
+            <div class="tracker-body">
+              <div class="tracker-label">Готов к выдаче</div>
+              <div class="tracker-date">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="orders-footnote">Это пример заказа — для демонстрации</div>
+    `;
+  }
+
+  el.innerHTML = html;
+}
+
+function renderLetters() {
+  const el = document.getElementById('letters-list');
+  el.innerHTML = EDITIONS.map(e => {
+    const hasLetter = e.status === 'current';
+    const key = e.name.toLowerCase();
+    return `
+    <div class="letter-item ${hasLetter ? 'unlocked' : 'locked'}" ${hasLetter ? `onclick="openLetter('${key}')"` : ''}>
+      <div class="letter-item-top">
+        <div class="li-edit">Edit N°${e.num}</div>
+        <div class="li-status">${hasLetter ? 'Доступно' : 'После выпуска'}</div>
+      </div>
+      <div class="li-name">${e.name}</div>
+      <div class="li-excerpt">${hasLetter ? 'В Ташкенте отопление включают в начале ноября…' : e.theme}</div>
+    </div>`;
+  }).join('');
+}
+
+function openProduct(i) {
+  const p = PRODUCTS[i];
+  document.getElementById('modalImg').innerHTML =
+    `<span class="filet filet-tl"></span><span class="filet filet-tr"></span><span class="filet filet-bl"></span><span class="filet filet-br"></span>` +
+    `<div class="modal-img-brand">${p.brand}</div><div class="modal-img-name">${p.name}</div>`;
+  document.getElementById('modalNum').textContent = `Edit N°I · Позиция ${p.n}`;
+  document.getElementById('modalBrand').textContent = p.brand;
+  document.getElementById('modalName').textContent = p.name;
+  document.getElementById('modalSize').textContent = p.size;
+  document.getElementById('modalPrice').textContent = p.price;
+  document.getElementById('modalDesc').textContent = p.desc;
+  document.getElementById('modalIngredients').innerHTML =
+    '<ul>' + p.ingredients.map(x => `<li>${x}</li>`).join('') + '</ul>';
+  document.getElementById('modalTexture').textContent = p.texture;
+  document.getElementById('modalFor').innerHTML =
+    '<ul>' + p.forWhom.map(x => `<li>${x}</li>`).join('') + '</ul>';
+  document.getElementById('modalOrigin').textContent = p.origin;
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function openLetter(key) {
+  const l = LETTERS[key];
+  if (!l) return;
+  document.getElementById('letterName').textContent = l.name;
+  document.getElementById('letterArabic').textContent = l.arabic;
+  document.getElementById('letterMeaning').textContent = l.meaning;
+  document.getElementById('letterText').innerHTML =
+    l.text.map(p => `<p>${p}</p>`).join('');
+  document.getElementById('letterModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLetter() {
+  document.getElementById('letterModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function goToScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.screen === name);
+  });
+  document.getElementById('screen-' + name).scrollTop = 0;
+}
+
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => goToScreen(btn.dataset.screen));
+});
+
+function updateCountdown() {
+  const target = new Date('2026-11-01T10:00:00+05:00').getTime();
+  const now = Date.now();
+  let diff = target - now;
+  if (diff < 0) diff = 0;
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+  document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeLetter(); closeIosGuide(); }
+});
+
+// ═══════════════════════════════════════════════
+// SMART INSTALL — platform-aware
+// Android/Chrome → native prompt. iOS/Safari → guide.
+// ═══════════════════════════════════════════════
+
+let deferredPrompt = null;
+
+// Detect: already running as installed app?
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
+// Detect iOS
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+// Android/Chrome fires this — we capture it to trigger later on our own button
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallCard('android');
+});
+
+// Safe localStorage — degrades gracefully if unavailable
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+// Show the install card with platform-appropriate copy
+function showInstallCard(platform) {
+  if (isStandalone()) return;                       // already installed
+  if (lsGet('saen-install-dismissed') === '1') return;
+  const card = document.getElementById('installCard');
+  const txt = document.getElementById('installCardText');
+  if (!card) return;
+  if (platform === 'ios') {
+    txt.textContent = 'Добавьте Saen на домашний экран — два простых шага в Safari, покажем как.';
+  } else {
+    txt.textContent = 'Добавьте Saen на домашний экран — приложение откроется в один тап, без браузера.';
+  }
+  card.classList.add('show');
+}
+
+// The install button
+function triggerInstall() {
+  if (deferredPrompt) {
+    // Android / Chrome — native install dialog
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choice) => {
+      if (choice.outcome === 'accepted') {
+        document.getElementById('installCard').classList.remove('show');
+        document.getElementById('installDivider').style.display = 'none';
+      }
+      deferredPrompt = null;
+    });
+  } else if (isIOS()) {
+    // iOS — show the manual guide (Apple blocks programmatic install)
+    openIosGuide();
+  } else {
+    // Fallback — show the iOS-style guide anyway
+    openIosGuide();
+  }
+}
+
+function dismissInstall() {
+  document.getElementById('installCard').classList.remove('show');
+  document.getElementById('installDivider').style.display = 'none';
+  lsSet('saen-install-dismissed', '1');
+}
+
+function openIosGuide() {
+  document.getElementById('iosGuide').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeIosGuide() {
+  document.getElementById('iosGuide').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// On iOS the beforeinstallprompt never fires — show card proactively
+if (isIOS() && !isStandalone()) {
+  showInstallCard('ios');
+}
+
+// If the app gets installed, hide everything install-related
+window.addEventListener('appinstalled', () => {
+  const card = document.getElementById('installCard');
+  const div = document.getElementById('installDivider');
+  if (card) card.classList.remove('show');
+  if (div) div.style.display = 'none';
+});
+
+// ═══════════════════════════════════════════════
+// CART STATE — позиции, выбранные клиентом
+// ═══════════════════════════════════════════════
+
+// Parse price like "~1 887 000 сум" → 1887000
+function parsePrice(s) {
+  const digits = String(s).replace(/[^\d]/g, '');
+  return parseInt(digits, 10) || 0;
+}
+
+// Format number with thin-space thousand separator
+function fmt(n) {
+  return Math.round(n).toLocaleString('ru-RU').replace(/,/g, ' ');
+}
+
+const CART_KEY = 'saen-cart-v1';
+
+const cart = {
+  items: new Set(),  // indices into PRODUCTS
+
+  has(i) { return this.items.has(i); },
+
+  toggle(i) {
+    if (this.items.has(i)) this.items.delete(i);
+    else this.items.add(i);
+    this.save();
+    renderCatalog();
+    this.updatePill();
+  },
+
+  remove(i) {
+    this.items.delete(i);
+    this.save();
+    renderCatalog();
+    this.updatePill();
+  },
+
+  clear() {
+    this.items.clear();
+    this.save();
+    renderCatalog();
+    this.updatePill();
+  },
+
+  count() { return this.items.size; },
+
+  total() {
+    let sum = 0;
+    this.items.forEach(i => { sum += parsePrice(PRODUCTS[i].price); });
+    return sum;
+  },
+
+  list() {
+    return Array.from(this.items).map(i => ({
+      n: PRODUCTS[i].n,
+      brand: PRODUCTS[i].brand,
+      name: PRODUCTS[i].name,
+      size: PRODUCTS[i].size,
+      price: parsePrice(PRODUCTS[i].price),
+      priceLabel: PRODUCTS[i].price.replace('~','').trim(),
+    }));
+  },
+
+  // Persist between sessions — so customer doesn't lose selection on reload
+  save() {
+    try {
+      const editIdx = CURRENT_EDIT_INDEX;
+      // Save with edition index — if the current edition changes, cart resets
+      const data = JSON.stringify({
+        edit: editIdx,
+        items: Array.from(this.items),
+        savedAt: Date.now(),
+      });
+      lsSet(CART_KEY, data);
+    } catch (e) {}
+  },
+
+  load() {
+    try {
+      const raw = lsGet(CART_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      // Reset cart if the edition has changed since last save
+      if (data.edit !== CURRENT_EDIT_INDEX) {
+        lsSet(CART_KEY, '');
+        return;
+      }
+      // Reset cart if older than 7 days (stale)
+      if (Date.now() - (data.savedAt || 0) > 7 * 24 * 60 * 60 * 1000) {
+        lsSet(CART_KEY, '');
+        return;
+      }
+      if (Array.isArray(data.items)) {
+        data.items.forEach(i => {
+          if (typeof i === 'number' && PRODUCTS[i]) this.items.add(i);
+        });
+      }
+    } catch (e) {}
+  },
+
+  // Russian plural for "позиция"
+  countWord(n) {
+    const lastTwo = n % 100;
+    const lastOne = n % 10;
+    if (lastTwo >= 11 && lastTwo <= 14) return 'позиций';
+    if (lastOne === 1) return 'позиция';
+    if (lastOne >= 2 && lastOne <= 4) return 'позиции';
+    return 'позиций';
+  },
+
+  updatePill() {
+    const pill = document.getElementById('cartPill');
+    const countEl = document.getElementById('cartCount');
+    const totalEl = document.getElementById('cartTotal');
+    const n = this.count();
+    if (n === 0) {
+      pill.classList.remove('show');
+      return;
+    }
+    countEl.textContent = `${n} ${this.countWord(n)}`;
+    totalEl.textContent = `${fmt(this.total())} сум`;
+    pill.classList.add('show');
+  },
+};
+
+// ═══════════════════════════════════════════════
+// ORDERS STATE — сохранённые заказы клиента
+// ═══════════════════════════════════════════════
+
+const orders = {
+  list: [],
+
+  load() {
+    const raw = lsGet('saen-orders');
+    if (raw) {
+      try { this.list = JSON.parse(raw); }
+      catch (e) { this.list = []; }
+    }
+  },
+
+  save() {
+    lsSet('saen-orders', JSON.stringify(this.list));
+  },
+
+  add(order) {
+    this.list.push(order);
+    this.save();
+  },
+
+  // Generate 4-digit order id (1000–9999)
+  newId() {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+  },
+};
+
+// ═══════════════════════════════════════════════
+// CHECKOUT FLOW — 4 шага
+// ═══════════════════════════════════════════════
+
+let checkoutStep = 1;
+let checkoutDelivery = 'delivery';  // 'delivery' | 'pickup'
+let currentOrderId = null;
+
+function openCheckout() {
+  if (cart.count() === 0) return;
+  checkoutStep = 1;
+  checkoutDelivery = 'delivery';
+  renderCheckoutStep();
+  document.getElementById('checkoutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCheckout() {
+  document.getElementById('checkoutModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderCheckoutStep() {
+  // Update progress bars
+  const bars = document.querySelectorAll('#checkoutProgress .progress-bar');
+  bars.forEach((b, i) => {
+    b.classList.remove('done', 'current');
+    if (i + 1 < checkoutStep) b.classList.add('done');
+    else if (i + 1 === checkoutStep) b.classList.add('current');
+  });
+
+  // Step label
+  const roman = ['', 'I', 'II', 'III', 'IV'];
+  document.getElementById('checkoutStepLabel').textContent =
+    `Шаг ${roman[checkoutStep]} из IV`;
+
+  // Show/hide step sections
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`step${i}`).style.display =
+      (i === checkoutStep) ? 'block' : 'none';
+  }
+
+  // Back button visibility
+  document.getElementById('btnBack').style.display =
+    (checkoutStep > 1 && checkoutStep < 4) ? 'block' : 'none';
+
+  // Primary button text
+  const btnText = document.getElementById('btnNextText');
+  if (checkoutStep === 1) btnText.textContent = 'Далее';
+  else if (checkoutStep === 2) btnText.textContent = 'Далее';
+  else if (checkoutStep === 3) btnText.textContent = 'Подтвердить';
+  else btnText.textContent = 'Готово';
+
+  // Hide action arrow on confirm step
+  const btnPrimary = document.getElementById('btnNext');
+  const arrowSpan = btnPrimary.querySelector('span:last-child');
+  if (checkoutStep === 4) {
+    arrowSpan.textContent = '';
+  } else {
+    arrowSpan.textContent = '→';
+  }
+
+  // Render content per step
+  if (checkoutStep === 1) renderReview();
+  if (checkoutStep === 3) updateAddressBlock();
+}
+
+function renderReview() {
+  const el = document.getElementById('reviewItems');
+  const items = cart.list();
+  el.innerHTML = items.map(it => `
+    <div class="review-item">
+      <div class="review-item-num">${it.n}</div>
+      <div class="review-item-body">
+        <div class="review-item-brand">${it.brand}</div>
+        <div class="review-item-name">${it.name}</div>
+        <div class="review-item-meta">${it.size}</div>
+      </div>
+      <div class="review-item-right">
+        <div class="review-item-price">${it.priceLabel}</div>
+        <button class="review-remove" onclick="removeFromCart('${it.n}')">убрать</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('reviewTotal').textContent = `${fmt(cart.total())} сум`;
+}
+
+function removeFromCart(productN) {
+  // Find by .n field
+  const idx = PRODUCTS.findIndex(p => p.n === productN);
+  if (idx >= 0) {
+    cart.remove(idx);
+    if (cart.count() === 0) {
+      closeCheckout();
+    } else {
+      renderReview();
+    }
+  }
+}
+
+function selectDelivery(type) {
+  checkoutDelivery = type;
+  document.querySelectorAll('.choice-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.choice === type);
+  });
+  updateAddressBlock();
+}
+
+function updateAddressBlock() {
+  const block = document.getElementById('addressBlock');
+  block.style.display = (checkoutDelivery === 'delivery') ? 'block' : 'none';
+}
+
+function nextStep() {
+  if (checkoutStep === 1) {
+    if (cart.count() === 0) return;
+    checkoutStep = 2;
+    renderCheckoutStep();
+  }
+  else if (checkoutStep === 2) {
+    // Validate contact
+    const name = document.getElementById('formName').value.trim();
+    const phone = document.getElementById('formPhone').value.trim();
+    if (!name) { alert('Пожалуйста, укажите имя'); return; }
+    if (!phone || phone.replace(/[^\d]/g, '').length < 9) {
+      alert('Пожалуйста, укажите корректный номер телефона');
+      return;
+    }
+    checkoutStep = 3;
+    renderCheckoutStep();
+  }
+  else if (checkoutStep === 3) {
+    if (checkoutDelivery === 'delivery') {
+      const addr = document.getElementById('formAddress').value.trim();
+      if (!addr) { alert('Пожалуйста, укажите адрес доставки'); return; }
+    }
+    submitOrder();
+  }
+  else if (checkoutStep === 4) {
+    // Done — close & go to Ledger
+    closeCheckout();
+    cart.clear();
+    goToScreen('orders');
+  }
+}
+
+function backStep() {
+  if (checkoutStep > 1 && checkoutStep < 4) {
+    checkoutStep--;
+    renderCheckoutStep();
+  }
+}
+
+async function notifyTelegram(order) {
+  // Best-effort delivery to your Telegram bot.
+  // If it fails (offline, server down) — order is still saved locally,
+  // so the customer's experience isn't broken.
+  try {
+    const res = await fetch('/api/notify-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order),
+    });
+    if (!res.ok) {
+      console.warn('Telegram notify failed:', res.status);
+      // Mark order as not-yet-notified so we can retry later
+      order._notified = false;
+      return false;
+    }
+    order._notified = true;
+    return true;
+  } catch (e) {
+    console.warn('Telegram notify error:', e);
+    order._notified = false;
+    return false;
+  }
+}
+
+function submitOrder() {
+  const currentEd = EDITIONS[CURRENT_EDIT_INDEX];
+  const order = {
+    id: orders.newId(),
+    edit: `N°${currentEd.num}`,
+    editFull: `Edit N°${currentEd.num} — ${currentEd.name}`,
+    items: cart.list(),
+    total: cart.total(),
+    contact: {
+      name:  document.getElementById('formName').value.trim(),
+      phone: document.getElementById('formPhone').value.trim(),
+      email: document.getElementById('formEmail').value.trim(),
+    },
+    delivery: {
+      type: checkoutDelivery,
+      address: checkoutDelivery === 'delivery'
+               ? document.getElementById('formAddress').value.trim()
+               : null,
+    },
+    status: 'pending',
+    createdAt: Date.now(),
+  };
+  orders.add(order);
+  currentOrderId = order.id;
+  document.getElementById('confirmOrderId').textContent = `№ ${order.id}`;
+
+  // Fire-and-forget notification to Telegram.
+  // Doesn't block confirmation UI — even if it fails, order is saved.
+  notifyTelegram(order).then(ok => {
+    if (ok) {
+      // Update stored order to reflect notification was sent
+      orders.save();
+    } else {
+      // Could be retried on next session — see retryPendingOrders()
+      orders.save();
+    }
+  });
+
+  // Reset form for next time
+  ['formName','formPhone','formEmail','formAddress'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  checkoutStep = 4;
+  renderCheckoutStep();
+  // Refresh orders screen in background
+  renderOrders();
+}
+
+// On app start, try to send any orders that failed to notify earlier
+function retryPendingOrders() {
+  orders.load();
+  const pending = orders.list.filter(o => o._notified === false);
+  if (pending.length === 0) return;
+  console.log(`Retrying ${pending.length} pending notification(s)`);
+  pending.forEach(o => notifyTelegram(o).then(() => orders.save()));
+}
+
+// ═══════════════════════════════════════════════
+// ONBOARDING — показывается один раз при первом запуске
+// ═══════════════════════════════════════════════
+
+const ONBOARD_KEY = 'saen-onboard-done';
+let onboardSlide = 0;
+const ONBOARD_SLIDES = 3;
+
+function shouldShowOnboard() {
+  return lsGet(ONBOARD_KEY) !== '1';
+}
+
+function showOnboard() {
+  const el = document.getElementById('onboard');
+  if (!el) return;
+  el.classList.add('show');
+  // Force scroller to start at slide 0
+  const scroller = document.getElementById('onboardScroller');
+  if (scroller) scroller.scrollLeft = 0;
+  onboardSlide = 0;
+  updateOnboardUI();
+}
+
+function finishOnboard() {
+  const el = document.getElementById('onboard');
+  if (!el) return;
+  el.classList.add('fading-out');
+  setTimeout(() => {
+    el.classList.remove('show', 'fading-out');
+  }, 600);
+  lsSet(ONBOARD_KEY, '1');
+}
+
+function onboardNext() {
+  if (onboardSlide < ONBOARD_SLIDES - 1) {
+    onboardSlide++;
+    const scroller = document.getElementById('onboardScroller');
+    const slideWidth = scroller.clientWidth;
+    scroller.scrollTo({ left: onboardSlide * slideWidth, behavior: 'smooth' });
+    updateOnboardUI();
+  } else {
+    finishOnboard();
+  }
+}
+
+function updateOnboardUI() {
+  document.querySelectorAll('.onboard-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === onboardSlide);
+  });
+  const ctaText = document.getElementById('onboardCtaText');
+  const ctaArrow = document.getElementById('onboardCtaArrow');
+  if (onboardSlide === ONBOARD_SLIDES - 1) {
+    ctaText.textContent = 'Начать';
+    ctaArrow.textContent = '';
+  } else {
+    ctaText.textContent = 'Далее';
+    ctaArrow.textContent = '→';
+  }
+}
+
+// Sync slide index on manual scroll/swipe
+function initOnboardScrollSync() {
+  const scroller = document.getElementById('onboardScroller');
+  if (!scroller) return;
+  let scrollTimeout;
+  scroller.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const slideWidth = scroller.clientWidth;
+      const newSlide = Math.round(scroller.scrollLeft / slideWidth);
+      if (newSlide !== onboardSlide && newSlide >= 0 && newSlide < ONBOARD_SLIDES) {
+        onboardSlide = newSlide;
+        updateOnboardUI();
+      }
+    }, 80);
+  }, { passive: true });
+}
+
+// ─── Init ───
+applyEditTheme(CURRENT_EDIT_INDEX);
+cart.load();    // restore cart from previous session
+renderHomeProducts();
+renderCatalog();
+renderCollection();
+renderOrders();
+renderLetters();
+updateCountdown();
+setInterval(updateCountdown, 60000);
+cart.updatePill();
+
+// Onboarding — only on first launch
+initOnboardScrollSync();
+if (shouldShowOnboard()) {
+  // Wait a tick for layout
+  requestAnimationFrame(() => showOnboard());
+}
+
+// Retry any orders that failed to notify Telegram earlier
+retryPendingOrders();
+
+// ═══════════════════════════════════════════════
+// SERVICE WORKER — detect new versions, prompt user to refresh
+// ═══════════════════════════════════════════════
+
+let waitingWorker = null;
+
+function showUpdateBanner(worker) {
+  waitingWorker = worker;
+  const banner = document.getElementById('updateBanner');
+  if (banner) banner.classList.add('show');
+}
+
+function applyUpdate() {
+  if (waitingWorker) {
+    waitingWorker.postMessage('SKIP_WAITING');
+  }
+  // Reload to pick up the new SW + fresh HTML
+  window.location.reload();
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      // If there's already a waiting worker, show the banner
+      if (reg.waiting) {
+        showUpdateBanner(reg.waiting);
+      }
+
+      // Listen for new SW installations
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          // 'installed' state with an existing controller = new version ready
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner(newWorker);
+          }
+        });
+      });
+
+      // Check for updates every time the page is shown (e.g. tab restored)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) reg.update().catch(() => {});
+      });
+    }).catch((e) => {
+      console.warn('SW registration failed:', e);
+    });
+
+    // When the controller changes (a new SW took over), the page should reload
+    // — but only after the user clicks "Обновить" (handled by applyUpdate).
+  });
+}
+</script>
+</body>
+</html>
