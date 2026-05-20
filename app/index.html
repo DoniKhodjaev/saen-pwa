@@ -59,6 +59,12 @@ html, body {
   overscroll-behavior: none;
 }
 
+html {
+  /* Fallback навигации — если cream body не доходит до самого низа
+     (например iOS safe-area квирки), снизу будет navy, не белый */
+  background: var(--navy);
+}
+
 @supports (height: 100dvh) {
   html, body { height: 100dvh; }
 }
