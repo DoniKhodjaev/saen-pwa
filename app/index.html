@@ -136,6 +136,20 @@ body {
   flex-shrink: 0;
 }
 
+/* Резервная navy-подушка для safe-area-inset-bottom зоны.
+   Гарантирует что под bottom-nav нет cream-полосы даже если
+   viewport-расчёты ушли в плавающее значение. */
+.safe-bottom-bg {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background: var(--navy);
+  z-index: 49;
+  pointer-events: none;
+}
+
 /* ═══════════ ORNAMENTAL ELEMENTS ═══════════ */
 .divider-ornament {
   display: flex;
@@ -1785,10 +1799,12 @@ body {
 
 /* ═══════════ BOTTOM NAV ═══════════ */
 .bottom-nav {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  max-width: 480px;
+  margin: 0 auto;
   height: var(--nav-total);
   background: var(--navy);
   display: flex;
@@ -3002,6 +3018,7 @@ body {
 
 <div class="paper-grain"></div>
 <div class="vignette"></div>
+<div class="safe-bottom-bg" aria-hidden="true"></div>
 
 <script>
 // ═══════════════════════════════════════════════
