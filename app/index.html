@@ -39,6 +39,8 @@
   --mono: 'JetBrains Mono', monospace;
 
   --nav-height: 82px;
+  /* Реальная высота навигации = базовая + iOS home indicator на iPhone X+ */
+  --nav-total: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -50,8 +52,15 @@
 }
 
 html, body {
-  height: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  /* Fallback for older browsers without dvh support */
+  height: -webkit-fill-available;
   overscroll-behavior: none;
+}
+
+@supports (height: 100dvh) {
+  html, body { height: 100dvh; }
 }
 
 body {
@@ -98,7 +107,7 @@ body {
 .screen {
   position: absolute;
   inset: 0;
-  bottom: var(--nav-height);
+  bottom: var(--nav-total);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -640,7 +649,7 @@ body {
   position: absolute;
   left: 20px;
   right: 20px;
-  bottom: calc(var(--nav-height) + 14px);
+  bottom: calc(var(--nav-total) + 14px);
   background: var(--navy);
   color: var(--cream);
   padding: 16px 22px;
@@ -649,7 +658,7 @@ body {
   justify-content: space-between;
   z-index: 40;
   border: 0.5px solid var(--brass);
-  transform: translateY(calc(100% + var(--nav-height) + 30px));
+  transform: translateY(calc(100% + var(--nav-total) + 30px));
   transition: transform 0.45s var(--ease);
   cursor: pointer;
   box-shadow: 0 8px 28px rgba(20,34,63,0.25);
@@ -1773,11 +1782,12 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--nav-height);
+  height: var(--nav-total);
   background: var(--navy);
   display: flex;
   align-items: flex-start;
-  padding: 14px 8px env(safe-area-inset-bottom, 8px);
+  padding: 14px 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   z-index: 50;
   border-top: 0.5px solid var(--brass);
 }

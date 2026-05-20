@@ -4,7 +4,7 @@
 
 // Bump this string on every meaningful release.
 // Old caches with different versions will be purged on activate.
-const VERSION = 'saen-v3-2026-05-19';
+const VERSION = 'saen-v4-2026-05-20';
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 
