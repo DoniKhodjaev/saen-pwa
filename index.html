@@ -1714,10 +1714,10 @@ footer {
       живёт на домашнем экране и открывается в один тап.
     </p>
     <button class="install-app-btn" id="siteInstallBtn" onclick="siteInstall()">
-      Установить приложение
+      Открыть приложение
       <span>→</span>
     </button>
-    <div class="install-app-note" id="siteInstallNote">Бесплатно · Без App Store · Несколько секунд</div>
+    <div class="install-app-note" id="siteInstallNote">Бесплатно · Без App Store · Установка в один тап</div>
 
     <div class="install-app-platforms">
       <div class="install-platform">
@@ -1995,46 +1995,22 @@ document.addEventListener('keydown', function(e) {
 // ═══════════════════════════════════════════════
 // SMART INSTALL — site → PWA
 // ═══════════════════════════════════════════════
+//
+// Кнопка установки на лендинге всегда ведёт на /app — там встроенный
+// install card устанавливает ИМЕННО PWA с правильным манифестом.
+// На лендинге нет manifest.json, поэтому если бы мы пытались установить
+// здесь — установился бы сам лендинг как PWA, что не нужно.
 
-// In production, set this to the deployed PWA path (e.g. '/app' or 'https://saen.uz/app')
-// In production this points to /app on the same domain (saen.uz/app)
-// Vercel will serve PWA from the /app directory in the repository.
 var SAEN_PWA_URL = '/app/';
-
-var siteDeferredPrompt = null;
 
 function siteIsIOS() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent)
       || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
-// Android/Chrome: capture the install event so our button can trigger it
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  siteDeferredPrompt = e;
-  var note = document.getElementById('siteInstallNote');
-  if (note) note.textContent = 'Установка в один тап · Без App Store';
-});
-
 function siteInstall() {
-  if (siteDeferredPrompt) {
-    // Android / Chrome — native install dialog, one tap
-    siteDeferredPrompt.prompt();
-    siteDeferredPrompt.userChoice.then(function(choice) {
-      if (choice.outcome === 'accepted') {
-        var btn = document.getElementById('siteInstallBtn');
-        if (btn) btn.innerHTML = 'Установлено ✓';
-      }
-      siteDeferredPrompt = null;
-    });
-  } else if (siteIsIOS()) {
-    // iOS — Apple blocks programmatic install, show the guide
-    document.getElementById('siteIosModal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  } else {
-    // Desktop / other — open the PWA directly
-    window.location.href = SAEN_PWA_URL;
-  }
+  // Всегда переход на PWA — там установка работает в правильном контексте
+  window.location.href = SAEN_PWA_URL;
 }
 
 function closeSiteIos() {
