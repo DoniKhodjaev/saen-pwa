@@ -18,7 +18,11 @@ http.createServer(async (req,res) => {
     const order=JSON.parse(body);const log=events.get(session) || [];log.push(order);events.set(session,log);
     if(mode==='conflict'){json(409,{ok:false,code:'CATALOG_CHANGED'});return;}
     const key=session+':'+order.id;const n=(attempts.get(key)||0)+1;attempts.set(key,n);
-    if(mode==='lost' && n===1){res.destroy();return;}
+    if(mode==='lost' && n===1){
+      // Break after headers/body begin: browsers may transparently replay a POST if nothing was received.
+      res.writeHead(200,{'content-type':'application/json','content-length':'500'});res.flushHeaders();res.write('{"ok":');
+      setTimeout(()=>res.destroy(),25);return;
+    }
     json(200,{ok:true,accepted:true,orderId:order.id,total:order.total,notification:'sent',mode:'live'});return;
   }
   if(pathname.startsWith('/api/')){json(405,{ok:false});return;}

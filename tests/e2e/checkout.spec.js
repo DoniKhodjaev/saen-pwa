@@ -56,7 +56,7 @@ test('offline shell, cart and draft survive reload; reconnect submits the same s
 test('lost response persists pending order and recovery uses same ID',async({page})=>{
   const errors=await setup(page,'lost');
   await form(page);await page.locator('#btnNext').click();
-  await expect.poll(async()=>(await entries(page))[0]?.sync.code).toBe('NETWORK_ERROR');
+  await expect.poll(async()=>(await entries(page))[0]?.sync.code).toBe('TEMPORARY_FAILURE');
   await page.reload();
   await expect.poll(async()=>(await entries(page))[0]?.sync.status,{timeout:30000}).toBe('accepted');
   const ids=(await sent(page)).map(o=>o.id);expect(ids.length).toBe(2);expect(ids[0]).toBe(ids[1]);expect(errors).toEqual([]);
