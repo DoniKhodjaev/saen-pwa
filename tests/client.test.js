@@ -56,3 +56,10 @@ test('browser storage denied at startup does not throw until reading or saving',
   try {const q=SaenOrders.create();assert.throws(()=>q.list());assert.throws(()=>q.add(order()));}
   finally {delete globalThis.localStorage;if(descriptor)Object.defineProperty(globalThis,'localStorage',descriptor);}
 });
+
+test('an actual aborted fetch timeout keeps the order queued',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const q=create({fetchImpl:(_,options)=>new Promise((resolve,reject)=>{options.signal.addEventListener('abort',()=>reject(new Error('AbortError')));})});
+  q.add(order());const pending=q.flush();t.mock.timers.tick(20001);await pending;
+  assert.equal(q.list()[0].sync.status,'queued');assert.equal(q.list()[0].sync.code,'NETWORK_ERROR');
+});

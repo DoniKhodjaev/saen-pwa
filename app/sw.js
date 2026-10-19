@@ -1,5 +1,5 @@
 // A release is cached as one unit: shell + catalog + queue. No mixed old/new scripts.
-const VERSION = 'saen-v9-2026-10-19-orders';
+const VERSION = 'saen-v10-2026-10-19-orders';
 const STATIC_CACHE = `${VERSION}-static`;
 const STATIC_ASSETS = ['/app/', '/app/catalog.js', '/app/order-schema.js', '/app/order-client.js',
   '/app/manifest.json', '/app/icon-192.png', '/app/icon-512.png'];

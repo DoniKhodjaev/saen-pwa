@@ -3981,7 +3981,6 @@ function showUpdateBanner(worker) {
 function applyUpdate() {
   if (waitingWorker) {
     updating = true;
-    saveCheckoutDraft();
     waitingWorker.postMessage('SKIP_WAITING');
   }
   // controllerchange reloads only after the waiting worker has activated.

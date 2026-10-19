@@ -114,6 +114,9 @@ test('Redis failures fail closed; indeterminate completion retains sending claim
 test('crash after durable claim is replayed without sending; request/order limits apply',async()=>{
   const f=fixture();f.store.requestAllowed=false;assert.equal((await f.handler(request(order()))).status,429);
   f.store.requestAllowed=true;f.store.limited=true;assert.equal((await f.handler(request(order()))).status,429);assert.equal(f.sends(),0);
+  const {digest}=await import('../lib/orders.js');const o=order();const intent=parse(o);
+  f.store.records.set(o.id,{fingerprint:await digest(JSON.stringify(intent)),order:o,mode:'live',notification:{status:'sending'}});
+  const replay=await (await f.handler(request(o))).json();assert.equal(replay.replayed,true);assert.equal(replay.notification,'sending');assert.equal(f.sends(),0);
 });
 test('mock mode stores acceptance without calling Telegram; message is escaped and bounded',async()=>{
   const f=fixture({env:{...env,ORDER_MODE:'mock',VERCEL_ENV:'preview'}});
