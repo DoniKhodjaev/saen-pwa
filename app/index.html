@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Saen">
 <title>Saen</title>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/app/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1176,6 +1176,7 @@ body {
 }
 
 .confirm-order-id {
+  overflow-wrap: anywhere;
   font-family: var(--mono);
   font-size: 13px;
   letter-spacing: 0.04em;
@@ -1599,6 +1600,9 @@ body {
 }
 
 .oc-id {
+  max-width: 62%;
+  overflow-wrap: anywhere;
+  text-align: right;
   font-family: var(--mono);
   font-size: 11px;
   color: var(--olive);
@@ -2865,16 +2869,16 @@ body {
         <div class="checkout-step-sub">Имя и номер — для подтверждения заказа</div>
         <div class="form-group">
           <label class="form-label">Имя <span class="req">*</span></label>
-          <input type="text" class="form-input" id="formName" placeholder="Ваше имя" autocomplete="name">
+          <input type="text" class="form-input" id="formName" maxlength="80" placeholder="Ваше имя" autocomplete="name">
         </div>
         <div class="form-group">
           <label class="form-label">Телефон <span class="req">*</span></label>
-          <input type="tel" class="form-input" id="formPhone" placeholder="+998 90 123 45 67" autocomplete="tel">
+          <input type="tel" class="form-input" id="formPhone" maxlength="24" placeholder="+998 90 123 45 67" autocomplete="tel">
           <div class="form-hint">Ташкент. Напишем в Telegram или позвоним</div>
         </div>
         <div class="form-group">
           <label class="form-label">Email <span style="color:var(--olive); font-style:italic; font-size: 12px;">— по желанию</span></label>
-          <input type="email" class="form-input" id="formEmail" placeholder="you@example.com" autocomplete="email">
+          <input type="email" class="form-input" id="formEmail" maxlength="120" placeholder="you@example.com" autocomplete="email">
           <div class="form-hint">Для письма куратора и подтверждения</div>
         </div>
       </div>
@@ -2895,7 +2899,7 @@ body {
         </div>
         <div id="addressBlock" class="form-group" style="margin-top: 22px;">
           <label class="form-label">Адрес доставки <span class="req">*</span></label>
-          <input type="text" class="form-input" id="formAddress" placeholder="Улица, дом, квартира">
+          <input type="text" class="form-input" id="formAddress" maxlength="240" placeholder="Улица, дом, квартира">
           <div class="form-hint">Подробности — район, ориентир — добавьте здесь</div>
         </div>
       </div>
@@ -2905,9 +2909,9 @@ body {
         <div class="confirm-icon">
           <svg viewBox="0 0 24 24"><path d="M5 12 L10 17 L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <h2 class="confirm-title">Предзаказ оформлен</h2>
+        <h2 class="confirm-title" id="confirmTitle" aria-live="polite">Сохранён на устройстве</h2>
         <div class="confirm-order-id" id="confirmOrderId">№ 0000</div>
-        <p class="confirm-text">
+        <p class="confirm-text" id="confirmText">
           Мы свяжемся с вами в течение 24 часов, пришлём реквизиты для предоплаты
           и подтвердим срок выдачи.
         </p>
@@ -2918,6 +2922,7 @@ body {
       </div>
     </div>
 
+    <p id="checkoutError" role="alert" style="padding:0 24px;color:var(--oxblood)"></p>
     <div class="checkout-action" id="checkoutAction">
       <button class="btn-back" id="btnBack" onclick="backStep()" style="display: none;">Назад</button>
       <button class="btn-primary" id="btnNext" onclick="nextStep()">
@@ -3020,76 +3025,15 @@ body {
 <div class="vignette"></div>
 <div class="safe-bottom-bg" aria-hidden="true"></div>
 
+<script src="/app/catalog.js"></script>
+<script src="/app/order-schema.js"></script>
+<script src="/app/order-client.js"></script>
 <script>
 // ═══════════════════════════════════════════════
 // SAEN PWA · v2 — Data & Logic
 // ═══════════════════════════════════════════════
 
-const PRODUCTS = [
-  {
-    n: 'I', brand: 'Augustinus Bader', name: 'The Rich Cream',
-    cat: 'Skincare', size: '15 ml · travel', price: '~1 887 000 сум',
-    desc: 'Хитовый премиум-крем последних двух лет. Густая, восстанавливающая текстура для холодного сезона. Один из немногих продуктов с реальной клинической доказательной базой.',
-    ingredients: ['<b>TFC8&#174;</b> — патентованный комплекс из 40+ молекул', 'Evening primrose oil — восстановление барьера', 'Avocado oil — омега-6 для эластичности'],
-    texture: 'Густой soufflé-cream, тает в плотную плёнку, впитывается за 2–3 минуты. Без отдушек. Утром и вечером, по 2 нажатия.',
-    forWhom: ['Сухая, обезвоженная кожа', '30+ с признаками старения', 'Холодный сезон, отопительный период'],
-    origin: 'Германия · Привозим из Sephora Middle East. Документы об оригинальности прикладываем к заказу.'
-  },
-  {
-    n: 'II', brand: 'Sulwhasoo', name: 'First Care Activating Serum',
-    cat: 'Skincare', size: '30 ml', price: '~1 690 000 сум',
-    desc: 'Корейская династическая формула 1997 года на основе традиционных трав. Подготавливает кожу к восприятию остального ухода — наносится первым шагом.',
-    ingredients: ['JAUM Balancing Complex — пять корейских трав', 'Pine mushroom extract', 'White lily — выравнивание тона'],
-    texture: 'Лёгкая, чуть маслянистая эссенция. 1–2 капли в ладонь, прикладывается к лицу. Не липкая, впитывается мгновенно.',
-    forWhom: ['Все типы кожи, особенно тусклая', 'Регулярное использование утром и вечером', 'Знакомство с K-beauty уходом'],
-    origin: 'Южная Корея · Привозим из официального Sulwhasoo boutique в Dubai Mall.'
-  },
-  {
-    n: 'III', brand: 'SK-II', name: 'Facial Treatment Essence',
-    cat: 'Skincare', size: '75 ml', price: '~2 287 000 сум',
-    desc: 'Легендарная Pitera эссенция, открытая в 1980-х в японской саке-варне. Более 50 микронутриентов, поддерживающих естественное обновление кожи.',
-    ingredients: ['<b>Pitera</b> — ферментированный галактомицес (90%+)', 'Аминокислоты — питание', 'Органические кислоты — мягкое обновление'],
-    texture: 'Прозрачная водянистая эссенция с лёгким ароматом ферментации. 4–5 капель, похлопывающими движениями. Утром и вечером.',
-    forWhom: ['Тусклая, неровная по тону кожа', '25+, профилактика старения', 'Любители японского skincare'],
-    origin: 'Япония · Привозим из Sephora Middle East. Запах ферментации — норма.'
-  },
-  {
-    n: 'IV', brand: 'Drunk Elephant', name: 'Lala Retro Whipped Cream',
-    cat: 'Skincare', size: '50 ml', price: '~1 391 000 сум',
-    desc: 'Восстановление барьера с использованием шести экзотических масел. Виральный продукт в TikTok skincare-сегменте. Философия «6 free».',
-    ingredients: ['Шесть масел: marula, mongongo, baobab и др.', 'Ceramide complex — восстановление барьера', 'Niacinamide — успокаивание'],
-    texture: 'Кремово-взбитая консистенция, переходит в шёлковую плёнку. Не оставляет жирного блеска. Вечером, в холодный сезон — и утром.',
-    forWhom: ['Сухая и очень сухая кожа', 'Нарушенный барьер', 'Любители clean beauty без silicones'],
-    origin: 'США · Привозим из Sephora Middle East.'
-  },
-  {
-    n: 'V', brand: 'Diptyque', name: 'Baies — свеча',
-    cat: 'Home', size: '70 g · 25 часов', price: '~894 000 сум',
-    desc: 'Создана в 1968 году — одна из первых свечей Diptyque и до сих пор самая продаваемая. Аромат чёрной смородины и болгарской розы.',
-    ingredients: ['Натуральный воск', 'Хлопковый фитиль', 'Чёрная смородина (top)', 'Болгарская роза (heart)'],
-    texture: 'Горит ровным пламенем без копоти. Аромат наполняет комнату через 10–15 минут. Перед первым зажжением — час горения для ровного воска.',
-    forWhom: ['Любители читать дома со свечой', 'Универсальный подарок', 'Создание atmosphere для встреч'],
-    origin: 'Франция · Производство в Бретани. Привозим из Diptyque boutique в Dubai Mall.'
-  },
-  {
-    n: 'VI', brand: 'Byredo', name: 'Mojave Ghost',
-    cat: 'Fragrance', size: '50 ml · EDP', price: '~3 974 000 сум',
-    desc: 'Создан Беном Горэмом в 2014 году. Самый продаваемый аромат Byredo всех времён. Унисекс. Назван в честь цветка пустыни Мохаве.',
-    ingredients: ['<b>Top:</b> Sapodilla, Ambrette', '<b>Heart:</b> Magnolia, Violet, Sandalwood', '<b>Base:</b> Cedarwood, Vetiver, Musk'],
-    texture: 'Открывается фруктово-древесными нотами, через 20 минут — тёплая sandalwood-база. Стойкость 6–8 часов. Шлейф мягкий, близкая аура.',
-    forWhom: ['Любители унисекс ароматов', 'Те, кто не хочет «громкий» парфюм', 'Поиск signature scent'],
-    origin: 'Швеция · Создан в Стокгольме, разлив в Италии. Привозим из Boutique 1 в Dubai.'
-  },
-  {
-    n: 'VII', brand: 'Aesop', name: 'Resurrection Hand Balm',
-    cat: 'Body', size: '75 ml', price: '~695 000 сум',
-    desc: 'Самый продаваемый продукт Aesop. Подходит как первое знакомство с брендом. Густой, ароматный, с травяной нотой rosemary, mandarin и cedar.',
-    ingredients: ['Mandarin Rind — освежающий цитрус', 'Rosemary Leaf — травяная теплота', 'Shea Butter — питание'],
-    texture: 'Плотный крем средней густоты. Не оставляет жирного следа. Аромат держится около часа. Капля растирается между ладонями.',
-    forWhom: ['Знакомство с миром Aesop', 'Популярный подарок', 'Сухие руки после частого мытья'],
-    origin: 'Австралия · Производство в Мельбурне. Привозим из Aesop boutique в The Dubai Mall.'
-  }
-];
+const PRODUCTS = SaenCatalog.products;
 
 // Each edition carries its own accent — patinated for the old-money palette.
 // accent = main brass, soft = pale ring/detail tone.
@@ -3207,7 +3151,10 @@ function renderCollection() {
 
 function renderOrders() {
   const el = document.getElementById('orders-content');
-  orders.load();
+  if (orders.load() === false) {
+    el.textContent = 'Не удалось прочитать сохранённые заказы. Проверьте доступ к хранилищу браузера.';
+    return;
+  }
 
   // Format thousands with thin space
   const fmt = (n) => Math.round(n).toLocaleString('ru-RU').replace(/,/g, ' ');
@@ -3225,7 +3172,7 @@ function renderOrders() {
   // Render user's actual orders first
   if (orders.list.length > 0) {
     orders.list.slice().reverse().forEach(o => {
-      const items = o.items.map(it => `${it.brand} · ${it.name}`).join('<br>');
+      const items = o.items.map(it => `${escapeHTML(it.brand)} · ${escapeHTML(it.name)}`).join('<br>');
       const prepayment = Math.round(o.total / 2);
       html += `
       <div class="order-card">
@@ -3234,8 +3181,8 @@ function renderOrders() {
         <span class="filet filet-bl"></span>
         <span class="filet filet-br"></span>
         <div class="order-card-head">
-          <div class="oc-edit">${o.editFull}</div>
-          <div class="oc-id">№ ${o.id}</div>
+          <div class="oc-edit">${escapeHTML(o.editFull)}</div>
+          <div class="oc-id">№ ${escapeHTML(o.id)}</div>
         </div>
         <div class="order-card-body">
           <div class="oc-items">${items}</div>
@@ -3247,7 +3194,7 @@ function renderOrders() {
             <div class="tracker-step current">
               <div class="tracker-rail"><div class="tracker-dot"></div><div class="tracker-line"></div></div>
               <div class="tracker-body">
-                <div class="tracker-label">Предзаказ оформлен</div>
+                <div class="tracker-label">${escapeHTML(orderStatus(o))}</div>
                 <div class="tracker-date">${fmtDate(o.createdAt)}</div>
               </div>
             </div>
@@ -3275,7 +3222,7 @@ function renderOrders() {
             <div class="tracker-step">
               <div class="tracker-rail"><div class="tracker-dot"></div></div>
               <div class="tracker-body">
-                <div class="tracker-label">${o.delivery.type === 'pickup' ? 'Готов к выдаче' : 'Доставка курьером'}</div>
+                <div class="tracker-label">${o.delivery?.type === 'pickup' ? 'Готов к выдаче' : 'Доставка курьером'}</div>
                 <div class="tracker-date">—</div>
               </div>
             </div>
@@ -3584,7 +3531,7 @@ const cart = {
 
   total() {
     let sum = 0;
-    this.items.forEach(i => { sum += parsePrice(PRODUCTS[i].price); });
+    this.items.forEach(i => { sum += PRODUCTS[i].priceUzs; });
     return sum;
   },
 
@@ -3594,7 +3541,7 @@ const cart = {
       brand: PRODUCTS[i].brand,
       name: PRODUCTS[i].name,
       size: PRODUCTS[i].size,
-      price: parsePrice(PRODUCTS[i].price),
+      price: PRODUCTS[i].priceUzs,
       priceLabel: PRODUCTS[i].price.replace('~','').trim(),
     }));
   },
@@ -3665,31 +3612,38 @@ const cart = {
 // ORDERS STATE — сохранённые заказы клиента
 // ═══════════════════════════════════════════════
 
+const escapeHTML = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+let orderQueue;
 const orders = {
   list: [],
-
   load() {
-    const raw = lsGet('saen-orders');
-    if (raw) {
-      try { this.list = JSON.parse(raw); }
-      catch (e) { this.list = []; }
-    }
+    let current = [];
+    try { current = orderQueue.list().map(entry => ({ ...entry.order, sync:entry.sync, editFull:SaenCatalog.edit,
+      items:entry.order.items.map(it => ({ ...it, ...(PRODUCTS.find(p => p.n === it.n) || {}) })) })); }
+    catch { return false; }
+    // Historical four-digit IDs cannot safely be replayed. Keep visible for manual reconciliation.
+    let legacy = [];
+    try {
+      const saved = JSON.parse(lsGet('saen-orders') || '[]');
+      if (Array.isArray(saved)) legacy = saved.filter(o => o && Array.isArray(o.items) && o.items.every(it => it && typeof it === 'object') && o.delivery && Number.isFinite(o.total))
+        .map(o => ({ ...o, sync:{ status:'legacy' } }));
+    } catch { /* preserve the original value */ }
+    this.list = [...legacy, ...current];
+    return true;
   },
-
-  save() {
-    lsSet('saen-orders', JSON.stringify(this.list));
-  },
-
-  add(order) {
-    this.list.push(order);
-    this.save();
-  },
-
-  // Generate 4-digit order id (1000–9999)
-  newId() {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-  },
+  newId() { return crypto.randomUUID(); },
 };
+orderQueue = SaenOrders.create({ changed:() => {
+  renderOrders();
+  if (currentOrderId) updateConfirmation();
+} });
+function orderStatus(o) {
+  if (o.sync?.status === 'accepted') return o.sync.mode === 'mock' ? 'Тестовый заказ принят' : 'Предзаказ принят сервером';
+  if (o.sync?.status === 'blocked') return ['CATALOG_CHANGED','PRICE_CHANGED','TOTAL_MISMATCH'].includes(o.sync.code)
+    ? 'Цены изменились. Обновите приложение и согласуйте заказ с Saen.' : 'Заказ требует проверки. Свяжитесь с Saen и сообщите номер.';
+  if (o.sync?.status === 'legacy') return 'Заказ старой версии. Уточните получение у Saen; повторно не отправляется.';
+  return 'Сохранён на устройстве · ожидает отправки';
+}
 
 // ═══════════════════════════════════════════════
 // CHECKOUT FLOW — 4 шага
@@ -3702,7 +3656,8 @@ let currentOrderId = null;
 function openCheckout() {
   if (cart.count() === 0) return;
   checkoutStep = 1;
-  checkoutDelivery = 'delivery';
+  selectDelivery('delivery', false);
+  restoreCheckoutDraft();
   renderCheckoutStep();
   document.getElementById('checkoutModal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -3791,12 +3746,13 @@ function removeFromCart(productN) {
   }
 }
 
-function selectDelivery(type) {
+function selectDelivery(type, persist = true) {
   checkoutDelivery = type;
   document.querySelectorAll('.choice-card').forEach(c => {
     c.classList.toggle('selected', c.dataset.choice === type);
   });
   updateAddressBlock();
+  if (persist) saveCheckoutDraft();
 }
 
 function updateAddressBlock() {
@@ -3814,8 +3770,8 @@ function nextStep() {
     // Validate contact
     const name = document.getElementById('formName').value.trim();
     const phone = document.getElementById('formPhone').value.trim();
-    if (!name) { alert('Пожалуйста, укажите имя'); return; }
-    if (!phone || phone.replace(/[^\d]/g, '').length < 9) {
+    if (name.length < 2 || name.length > 80) { alert('Укажите имя длиной от 2 до 80 символов'); return; }
+    if (!/^(?:998)?\d{9}$/.test(phone.replace(/[^\d]/g, ''))) {
       alert('Пожалуйста, укажите корректный номер телефона');
       return;
     }
@@ -3832,7 +3788,6 @@ function nextStep() {
   else if (checkoutStep === 4) {
     // Done — close & go to Ledger
     closeCheckout();
-    cart.clear();
     goToScreen('orders');
   }
 }
@@ -3844,89 +3799,70 @@ function backStep() {
   }
 }
 
-async function notifyTelegram(order) {
-  // Best-effort delivery to your Telegram bot.
-  // If it fails (offline, server down) — order is still saved locally,
-  // so the customer's experience isn't broken.
+const DRAFT_KEY = 'saen-checkout-draft-v1';
+let submitting = false;
+function checkoutError(message) {
+  document.getElementById('checkoutError').textContent = message;
+}
+function saveCheckoutDraft() {
+  const draft = { delivery:checkoutDelivery };
+  ['formName','formPhone','formEmail','formAddress'].forEach(id => { draft[id] = document.getElementById(id).value; });
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); }
+  catch { checkoutError('Не удалось сохранить черновик на устройстве. Проверьте хранилище браузера.'); }
+}
+function restoreCheckoutDraft() {
   try {
-    const res = await fetch('/api/notify-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(order),
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+    if (!draft) return;
+    ['formName','formPhone','formEmail','formAddress'].forEach(id => {
+      if (typeof draft[id] === 'string') document.getElementById(id).value = draft[id];
     });
-    if (!res.ok) {
-      console.warn('Telegram notify failed:', res.status);
-      // Mark order as not-yet-notified so we can retry later
-      order._notified = false;
-      return false;
-    }
-    order._notified = true;
-    return true;
-  } catch (e) {
-    console.warn('Telegram notify error:', e);
-    order._notified = false;
-    return false;
-  }
+    if (['pickup','delivery'].includes(draft.delivery)) selectDelivery(draft.delivery, false);
+  } catch { /* keep form usable */ }
 }
-
+function updateConfirmation() {
+  const entry = orderQueue.list().find(e => e.order.id === currentOrderId);
+  if (!entry) return;
+  document.getElementById('confirmTitle').textContent = orderStatus({ sync:entry.sync });
+  document.getElementById('confirmText').textContent = entry.sync.status === 'accepted'
+    ? (entry.sync.mode === 'mock' ? 'Это тестовый режим: уведомление не отправлялось.' : 'Мы получили предзаказ. Менеджер подтвердит наличие, стоимость и срок выдачи; дождитесь связи перед оплатой.')
+    : entry.sync.status === 'blocked'
+      ? 'Данные сохранены. Сообщите Saen номер заказа перед повторным оформлением.'
+      : 'Предзаказ пока не получен Saen. Откройте приложение при доступном интернете: отправка повторится автоматически с тем же номером.';
+}
 function submitOrder() {
-  const currentEd = EDITIONS[CURRENT_EDIT_INDEX];
-  const order = {
-    id: orders.newId(),
-    edit: `N°${currentEd.num}`,
-    editFull: `Edit N°${currentEd.num} — ${currentEd.name}`,
-    items: cart.list(),
-    total: cart.total(),
-    contact: {
-      name:  document.getElementById('formName').value.trim(),
-      phone: document.getElementById('formPhone').value.trim(),
-      email: document.getElementById('formEmail').value.trim(),
-    },
-    delivery: {
-      type: checkoutDelivery,
-      address: checkoutDelivery === 'delivery'
-               ? document.getElementById('formAddress').value.trim()
-               : null,
-    },
-    status: 'pending',
-    createdAt: Date.now(),
-  };
-  orders.add(order);
-  currentOrderId = order.id;
-  document.getElementById('confirmOrderId').textContent = `№ ${order.id}`;
-
-  // Fire-and-forget notification to Telegram.
-  // Doesn't block confirmation UI — even if it fails, order is saved.
-  notifyTelegram(order).then(ok => {
-    if (ok) {
-      // Update stored order to reflect notification was sent
-      orders.save();
-    } else {
-      // Could be retried on next session — see retryPendingOrders()
-      orders.save();
-    }
-  });
-
-  // Reset form for next time
-  ['formName','formPhone','formEmail','formAddress'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-
-  checkoutStep = 4;
-  renderCheckoutStep();
-  // Refresh orders screen in background
-  renderOrders();
+  if (submitting || cart.count() === 0) return;
+  submitting = true;
+  const button = document.getElementById('btnNext'); button.disabled = true;
+  checkoutError('');
+  try {
+    const order = {
+      id:orders.newId(), catalogVersion:SaenCatalog.version,
+      items:cart.list().map(it => ({ n:it.n, price:it.price })), total:cart.total(),
+      contact:{ name:document.getElementById('formName').value.trim(), phone:document.getElementById('formPhone').value.trim(), email:document.getElementById('formEmail').value.trim() },
+      delivery:{ type:checkoutDelivery, address:checkoutDelivery === 'delivery' ? document.getElementById('formAddress').value.trim() : null },
+      createdAt:Date.now(),
+    };
+    orderQueue.add(order); // throws if persistence or validation fails; retain form/cart in that case
+    currentOrderId = order.id;
+    document.getElementById('confirmOrderId').textContent = `№ ${order.id}`;
+    cart.clear();
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    ['formName','formPhone','formEmail','formAddress'].forEach(id => { document.getElementById(id).value = ''; });
+    checkoutStep = 4; renderCheckoutStep(); updateConfirmation(); renderOrders();
+    retryPendingOrders();
+  } catch (error) {
+    checkoutError(error.code === 'INVALID_ORDER' ? 'Проверьте имя, телефон +998, email и адрес (не менее 5 символов).' : 'Не удалось сохранить заказ на устройстве. Освободите место или разрешите хранилище браузера. Данные остались в форме.');
+  } finally { submitting = false; button.disabled = false; }
 }
-
-// On app start, try to send any orders that failed to notify earlier
 function retryPendingOrders() {
-  orders.load();
-  const pending = orders.list.filter(o => o._notified === false);
-  if (pending.length === 0) return;
-  console.log(`Retrying ${pending.length} pending notification(s)`);
-  pending.forEach(o => notifyTelegram(o).then(() => orders.save()));
+  orderQueue.flush().catch(() => checkoutError('Не удалось обновить сохранённый заказ. Откройте приложение повторно.'));
 }
+['formName','formPhone','formEmail','formAddress'].forEach(id => document.getElementById(id).addEventListener('input', saveCheckoutDraft));
+window.addEventListener('online', retryPendingOrders);
+window.addEventListener('storage', () => { renderOrders(); retryPendingOrders(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) retryPendingOrders(); });
+setInterval(() => { if (!document.hidden) retryPendingOrders(); }, 15000);
 
 // ═══════════════════════════════════════════════
 // ONBOARDING — показывается один раз при первом запуске
@@ -4033,6 +3969,8 @@ retryPendingOrders();
 // ═══════════════════════════════════════════════
 
 let waitingWorker = null;
+let updating = false;
+navigator.serviceWorker?.addEventListener('controllerchange', () => { if (updating) window.location.reload(); });
 
 function showUpdateBanner(worker) {
   waitingWorker = worker;
@@ -4042,15 +3980,16 @@ function showUpdateBanner(worker) {
 
 function applyUpdate() {
   if (waitingWorker) {
+    updating = true;
+    saveCheckoutDraft();
     waitingWorker.postMessage('SKIP_WAITING');
   }
-  // Reload to pick up the new SW + fresh HTML
-  window.location.reload();
+  // controllerchange reloads only after the waiting worker has activated.
 }
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then((reg) => {
+    navigator.serviceWorker.register('/app/sw.js', { scope:'/app/', updateViaCache:'none' }).then((reg) => {
       // If there's already a waiting worker, show the banner
       if (reg.waiting) {
         showUpdateBanner(reg.waiting);
@@ -4083,3 +4022,4 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+

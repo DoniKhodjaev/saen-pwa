@@ -1,0 +1,17 @@
+{
+  "name": "saen-pwa",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "check": "node scripts/check.mjs",
+    "orders:review": "node scripts/review-orders.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
+  }
+}
